@@ -1,4 +1,4 @@
-name = "BINF200 VSG"
+name = "BINF200"
 authors = ["tmichoel"]
 [compat]
 julia = "1.9.0"
