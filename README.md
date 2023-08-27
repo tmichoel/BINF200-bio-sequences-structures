@@ -25,6 +25,6 @@ everything should work out of the box, including correctly finding local paths.
 You may notice that most scripts start with the commands:
 ```julia
 using DrWatson
-@quickactivate "BINF200 VSG"
+@quickactivate "BINF200"
 ```
 which auto-activate the project and enable local path handling from DrWatson.
