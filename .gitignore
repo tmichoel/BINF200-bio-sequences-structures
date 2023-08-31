@@ -1,5 +1,7 @@
 /.quarto/
 /.vscode
+_site/
+.jupyter_cache
 
 ################################################################################
 #                          DrWatson Project Structure                          #

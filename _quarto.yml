@@ -1,13 +1,24 @@
 project:
   type: website
+  render:
+    - "*.qmd"
+    - "!notebooks/"
+    - "!scripts/"
+  post-render: mv *.ipynb notebooks/
 
 website:
   title: "BINF200 Biological Sequences and Structures"
   navbar:
-    left:
+    search: true
+  sidebar:
+    style: "docked"
+    search: true
+    contents:
       - href: index.qmd
         text: Home
-      - about.qmd
+      - section: "Assignments"
+        contents:
+          - assignment_PacBio_VSG.qmd
 
 format:
   html:

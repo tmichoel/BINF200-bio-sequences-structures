@@ -4,12 +4,24 @@ using DrWatson
 using BioSequences
 using FASTX
 
-samplenames = ["3_1", "3_2", "3_3", "3_4", "3_5", "6_1", "6_2", "6_3", "6_4", "6_5", "10_1", "10_2", "10_3", "10_4", "10_5", "12_1", "12_2", "12_3", "12_4", "12_5"]
-
+# Read all filtered reads in a vector of FASTA records
 vsgseq = Vector{FASTARecord}();
-
 FASTAReader( open(datadir("exp_raw", "PacBio_VSG", "PacBio_VSG_filtered_reads.fasta")) ) do reader
     for record in reader
         push!(vsgseq, record)
+    end
+end
+
+# Parse sample names
+parsed_descriptions = split.(description.(vsgseq),"/");
+sample_names = map(x -> x[1], parsed_descriptions)
+
+# For each sample name, find the corresponding records and write them to a new file
+for nm = String.(unique(sample_names))
+    records = vsgseq[contains.(description.(vsgseq), nm)];
+    FASTAWriter(open(datadir("exp_pro", "PacBio_VSG", "PacBio_VSG_filtered_reads_" * nm * ".fasta"), "w+")) do writer
+        for record in records
+            write(writer, record)
+        end
     end
 end

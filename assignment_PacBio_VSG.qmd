@@ -1,0 +1,96 @@
+---
+title: "Assignment: PacBio VSG"
+date: 2023-09-14
+published-title: Due date
+description: >
+   BINF200 Compulsory Assignment 1 <br>
+   10 points, 10% of the final grade
+number-sections: true
+link-external-icon: true
+---
+## Introduction
+
+## Software
+
+### BLAST
+
+Install the NCBI command line standalone BLAST+ programs following the [online instructions](https://www.ncbi.nlm.nih.gov/books/NBK52640/). 
+
+Direct link to the ftp directory: [https://ftp.ncbi.nlm.nih.gov/blast/executables/LATEST/](https://ftp.ncbi.nlm.nih.gov/blast/executables/LATEST/)
+
+### GetORF
+
+[https://bio.tools/getorf](https://bio.tools/getorf)
+
+### Programming language
+
+You may use any language: Python, Julia, R, ...
+
+### Data analysis and visualization, report writing
+
+Use [JupyterLab](https://jupyter.org/) (or notebooks) and/or an IDE such as [Visual Studio Code](https://code.visualstudio.com/) for data analysis and visualization.
+
+Using [Quarto](https://quarto.org/) you can integrate your notebooks, data visualization, and final report all in one document
+
+## Sequence data
+
+All data for the assignment are available on [UiB OneDrive](https://universityofbergen-my.sharepoint.com/:f:/g/personal/tom_michoel_uib_no/EphdekZYkYBJnqYKRcpoOfsBJBouvZhTOQEorETwKBHGsA?e=roErlx) in the **PacBIO VSG** folder. You will need to login with your UiB account to have access.
+
+Sequencing data are available for 20 samples (individual mice) in files named **PacBio_VSG_filtered_reads_*sample_name*.fasta**. You will analyze **one** sample (**one** file). To find out which sample:
+
+1. Go to the **Groups** page on Mitt ([https://mitt.uib.no/courses/42444/groups](https://mitt.uib.no/courses/42444/groups))
+2. Select the **Compulsory Assignment 1 - Sample** tab and find to which group you have been (randomly) assigned.
+3. Each group is named  **Compulsory Assignment 1 - Sample *k***, where *k* is a number from 1 to 20 mapping to the sample names as follows:
+
+| k  | Sample name |
+|----|-------------|
+| 1  | balbc_3_0   |
+| 2  | balbc_3_1   |
+| 3  | balbc_3_2   |
+| 4  | balbc_3_3   |
+| 5  | balbc_3_4   |
+| 6  | balbc_6_0   |
+| 7  | balbc_6_1   |
+| 8  | balbc_6_2   |
+| 9  | balbc_6_4   |
+| 10 | balbc_6_5   |
+| 11 | balbc_10_0   |
+| 12 | balbc_10_1   |
+| 13 | balbc_10_2   |
+| 14 | balbc_10_4   |
+| 15 | balbc_10_5   |
+| 16 | balbc_12_1   |
+| 17 | balbc_12_2   |
+| 18 | balbc_12_3   |
+| 19 | balbc_12_4   |
+| 20 | balbc_12_5   |
+
+: Mapping of group labels to sample names {#tbl-groups}
+
+You also need a database of known VSG genes. Download the entire folder **TREU927-v26_VSGTranscripts**.
+
+## Tasks
+
+### Show that you understand the BLAST+ package
+
+The BLAST+ package contains five **core blast search programs**. 
+
+1. List all five core blast search programs.
+2. Explain the difference between **blastn** and **blastp**.
+
+### Show that you understand the biological experiment and data
+
+Write a short paragraph in your own words to explain the biological experiment that generated the sequence data (see the [publication][1]), what sequences are contained in the **PacBio_VSG_filtered_reads_*sample_name*.fasta** files, and what sequences are contained in the **TREU927-v26_VSGTranscripts** database.
+
+
+### BLAST the sample sequences against the reference VSG database
+
+The relevant BLAST command can be found on the [longread-application repository][2]. Adapt this command in the following ways:
+
+1. Change the input file name to your assigned sample file (see @tbl-groups).
+2. Change the output file name to something containing your sample label (see @tbl-groups).
+3. 
+
+
+[1]: https://doi.org/10.1371/journal.pntd.0007262
+[2]: https://github.com/siddharthjayaraman/longread-application
