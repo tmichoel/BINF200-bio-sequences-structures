@@ -19,6 +19,7 @@ website:
       - section: "Assignments"
         contents:
           - assignment_PacBio_VSG.qmd
+          - assignment_PacBio_VSG_solution.qmd
 
 format:
   html:

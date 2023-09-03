@@ -1,0 +1,205 @@
+---
+title: "Assignment: PacBio VSG - Solution"
+date: 2023-09-14
+published-title: Due date
+description: >
+   BINF200 Compulsory Assignment 1 <br>
+   10 points, 10% of the final grade
+number-sections: true
+link-external-icon: true
+jupyter: julia-1.9
+execute: 
+  cache: true
+  keep-ipynb: true
+---
+## Setup the environment
+```{julia}
+using DrWatson
+@quickactivate "BINF200"
+
+using BioSequences
+using FASTX
+using DataFrames
+using CSV
+using StatsPlots
+using LaTeXStrings
+```
+
+## Tasks
+
+Set the sample name:
+```{julia}
+sample = "balbc_10_1"
+```
+
+### BLAST the sample sequences against the reference VSG database
+
+5. **What is the number of sequences in *your* input file?**
+
+   Read the FASTA file into a vector of FASTA records:
+   ```{julia}
+   filtered_reads = Vector{FASTARecord}();
+   FASTAReader( open(datadir("PacBio_VSG", "filtered_reads", "PacBio_VSG_filtered_reads_" * sample * ".fasta")) ) do reader
+      for record in reader
+         push!(filtered_reads, record);
+      end
+   end
+   ```
+
+   The number of sequences in the sample is:
+
+   ```{julia}
+   length(filtered_reads)
+   ```
+
+6. **What is the number of sequences in *your* output file?**
+
+   Import the blast results in a DataFrame. The column names can be constructed from the blastn command.
+   ```{julia}
+   df = DataFrame(CSV.File( datadir("PacBio_VSG", "blastn", "PacBio_VSG_filtered_reads_blastn_" * sample * ".txt"), header=false ));
+   rename!(df, ["qseqid", "sseqid", "score", "bitscore", "evalue", "qlen", "slen", "length", "sstart", "send", "nident", "mismatch", "gaps", "positive"]);
+   ```
+
+   The number of sequences in the output file is:
+
+   ```{julia}
+   nrow(df)
+   ```
+
+   Despite setting the option `-max_target_seq 1` in the `blastn` command, this number may be *greater* than the number of input sequences. The reason is that sometimes for *one* query sequence, *two* separate alignments are found against the *same* subject sequence. To show this, we compute for each unique query id, its number of alignments (number of rows it appears in in `df`) and the number of unique subject ids in those rows:
+
+   ```{julia}
+   df_qseqid_count = combine(groupby(df[:,1:2], :qseqid), nrow, :sseqid => x -> length(unique(x)));
+   ```
+
+   We see that now the number of unique query sequences is indeed equal to the number of input sequences:
+
+   ```{julia}
+   nrow(df_qseqid_count) == length(filtered_reads)
+   ```
+
+   We also see that sometimes two alignments were found per query sequence:
+
+   ```{julia}
+   unique(df_qseqid_count.nrow)
+   ```
+
+   But the number of unique subject sequences was always one:
+
+   ```{julia}
+   unique(df_qseqid_count.sseqid_function)
+   ```
+
+7. **We define the alignment coverage as the percentage of the subject sequence covered by the alignment. Compute the alignment coverage for all sequences from the blastn output. Count and remove alignments with coverage less than 60%.**
+
+   ```{julia}
+   df.alignment_coverage = df.length ./ df.slen;
+   ```
+
+   Show the distribution of alignment coverages as a histogram
+
+   ```{julia}
+   histogram(100*df.alignment_coverage, label="", xlabel="Alignment coverage (%)")
+   ```
+
+   Keep only alignments with coverage greater than 60%:
+
+   ```{julia}
+   subset!(df, :alignment_coverage => x -> x.>= 0.6);
+   ```
+
+8. **The bit score $S'$ is derived from the raw score $S$ using the formula**
+
+   $$
+   S' = \frac{\lambda S - \ln K}{\ln 2}
+   $$
+
+   In other words, the bit score is a linear function of the raw score, which we can verify immediately using a scatter plot:
+
+   ```{julia}
+   scatter(df.score, df.bitscore)
+   ```
+
+   If $(x_1,y_1)$ and $(x_2,y_2)$ are two point on a line $y=a x + b$, the slope $a$ is found from
+
+   $$
+   a = \frac{y_2 - y_1}{x_2 - x_1}.
+   $$
+
+   Once we know the slope, the intercept $b$ is found from $b = y_2 - a x_2$. Applied to the alignment scores, we only need two pairs of scores, and might as well take the ones furthest apart:
+
+   ```{julia}
+   i1 = argmin(df.score);
+   i2 = argmax(df.score);
+   x1, y1 = [df.score[i1], df.bitscore[i1]]
+   x2, y2 = [df.score[i2], df.bitscore[i2]]
+   a = (y2 - y1) / (x2 - x1);
+   b = y2 - a * x2;
+   ```
+
+   The parameters $\lambda$ and $K$ follow:
+
+   ```{julia}
+   λ = a*log(2)
+   ```
+
+   ```{julia}
+   K = 2^(-b)
+   ```
+
+### Count VSG expression levels
+
+From the previous BLAST results:
+
+1. **Extract the unique VSG ids in *your* sample**
+
+   ```{julia}
+   vsg = unique(df.sseqid);
+   ```
+
+2. **Count the number of sequences aliging to each unique VSG.**
+
+   First create a grouped dataframe from the query and subject ids, grouped by subject id (VSG). Then combine and count number of rows in each one. 
+
+   ```{julia}
+   df_vsg = combine( groupby(df[:,1:2], :sseqid) , nrow );
+   rename!(df_vsg, ["VSG", "count"]);
+   ```
+
+
+3. **Identify the 10 most abundant VSGs in *your* sample and visualize their relative expression levels in a pie chart.**
+
+   ```{julia}
+   sort!(df_vsg, :count, rev=true)
+   pie(df_vsg.VSG[1:10], df_vsg.count[1:10] )
+   ```
+
+### Identify open reading frames
+
+1. **Count the percentage of reads in *your* sample that result in a predicted ORF with a minimum size of 1200 nucleotides.**
+
+   Read the ORF file:
+
+   ```{julia}
+   predicted_orfs = Vector{FASTARecord}();
+   FASTAReader( open(datadir("PacBio_VSG", "orf", "PacBio_VSG_filtered_reads_ORF_" * sample * ".fasta")) ) do reader
+      for record in reader
+         push!(predicted_orfs, record)
+      end
+   end
+   ```
+
+   The number of reads with predicted ORF with a minimum size of 1200 is
+
+   ```{julia}
+   length(predicted_orfs)
+   ```
+
+   The percentage is
+
+   ```{julia}
+   100 * length(predicted_orfs) / length(filtered_reads)
+   ```
+
+[1]: https://doi.org/10.1371/journal.pntd.0007262
+[2]: https://github.com/siddharthjayaraman/longread-application
