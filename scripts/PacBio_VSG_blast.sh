@@ -4,6 +4,8 @@
 sampledir=../data/PacBio_VSG
 cd $sampledir
 
+dbf=TREU927-v26_VSGTranscripts/TREU927-v26_VSGTranscripts.fasta
+
 # Run for all sample files or specify specific file 
 for qf in filtered_reads/PacBio_VSG_filtered_reads_*.fasta
 do 

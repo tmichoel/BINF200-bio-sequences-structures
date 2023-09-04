@@ -1,0 +1,160 @@
+---
+title: "BINF200 Assignment 1"
+author: Tom Michoel
+date: 2023-09-14
+published-title: Due date
+number-sections: true
+link-external-icon: true
+---
+## Grading and report
+
+The assignment is scored on 10 points and counts towards 10% of the final grade.
+
+Your report should be a single PDF file that contains your report text, code, and figures in a single doc
+
+## Background
+
+In this assignment you will analyze data from the following paper:
+
+S. Jayaraman *et al.* (2019), [Application of long read sequencing to determine expressed antigen diversity in Trypanosoma brucei infections][1], PLOS Neglected Tropical Diseases 13(4): e0007262.
+
+You will need a copy of the paper to answer some of the assignment question.
+
+The paper has an accompanying [Github repository][2] where you will find some useful commands.
+
+## Software
+
+You will need the following software to solve the assignment:
+
+1. **BLAST+**: Install the NCBI command line standalone BLAST+ programs following the [online instructions](https://www.ncbi.nlm.nih.gov/books/NBK52640/). 
+   - On Windows, installation in the [Windows Subsystem for Linux](https://learn.microsoft.com/en-us/windows/wsl/) will be easier than following the above instructions.
+   - For Ubuntu (and hence also WSL), there exists a package "ncbi-blast+"  not listed on the NCBI page, which you can install directly using `apt-get install`.
+
+2. **GetORF**: Install the [getorf](https://bio.tools/getorf) tool. The [installation instructions](http://emboss.open-bio.org/html/adm/ch01s01.html) are a bit tedious, but you should get there in the end. Again, on Windows, installation in the WSL will be easier.
+
+3. **Programming language**: You may use any language: Python, Julia, R, ...
+
+4. **Packages** for reading FASTA-formatted files and importing and manipulating DataFrames. Find and install them for your preferred programming language. 
+
+5. **Data analysis and visualization, report writing**: Use [JupyterLab](https://jupyter.org/) (or Jupyter notebooks) and/or an IDE such as [Visual Studio Code](https://code.visualstudio.com/) for data analysis and visualization. Using [Quarto](https://quarto.org/) you can integrate your notebooks, data visualization, and final report all in a markdown document. [Pluto](https://plutojl.org/) notebooks for Julia offer nice reactive features. 
+
+## Sequence data {#sec-data}
+
+All data for the assignment are available on [UiB OneDrive](https://universityofbergen-my.sharepoint.com/:f:/g/personal/tom_michoel_uib_no/EphdekZYkYBJnqYKRcpoOfsBJBouvZhTOQEorETwKBHGsA?e=roErlx) in the **PacBio VSG** folder. You will need to login with your UiB account to obtain access. You will need the following files:
+
+1. A database of known VSG genes. Download the entire folder **TREU927-v26_VSGTranscripts**.
+
+2. Sequencing data from **one** sample (**one** file) named  **PacBio_VSG_filtered_reads_*sample_name*.fasta**. Twenty such files, for 20 samples (individual mice), are available in total. To find out which one *you* should download:
+
+   1. Go to the **Groups** page on Mitt ([https://mitt.uib.no/courses/42444/groups](https://mitt.uib.no/courses/42444/groups))
+   2. Select the **Compulsory Assignment 1 - Sample** tab and find to which group you have been (randomly) assigned.
+   3. Each group is named  **Compulsory Assignment 1 - Sample *k***, where *k* is a number from 1 to 20 mapping to the sample names as follows:
+
+| k  | Sample name | k  | Sample name |
+|----|-------------|----|-------------|
+| 1  | balbc_3_0   | 11 | balbc_10_0   |
+| 2  | balbc_3_1   | 12 | balbc_10_1   |
+| 3  | balbc_3_2   | 13 | balbc_10_2   |
+| 4  | balbc_3_3   | 14 | balbc_10_4   |
+| 5  | balbc_3_4   | 15 | balbc_10_5   |
+| 6  | balbc_6_0   | 16 | balbc_12_1   |
+| 7  | balbc_6_1   | 17 | balbc_12_2   |
+| 8  | balbc_6_2   | 18 | balbc_12_3   |
+| 9  | balbc_6_4   | 19 | balbc_12_4   |
+| 10 | balbc_6_5   | 20 | balbc_12_5   |
+
+: Mapping of group labels to sample names {#tbl-groups}
+
+
+
+## Tasks
+
+### Show that you understand the BLAST+ package
+
+The BLAST+ package contains five **core blast search programs**. 
+
+1. List all five core blast search programs.
+2. Explain the difference between **blastn** and **blastp**.
+
+### Show that you understand the biological experiment and data
+
+Write a short paragraph in your own words to explain the biological experiment that was done to generate the sequence data (see the [publication][1]), what sequences are contained in the **PacBio_VSG_filtered_reads_*sample_name*.fasta** files, and what sequences are contained in the **TREU927-v26_VSGTranscripts** database.
+
+Answer the following question: What is the number of sequences in *your* input file?
+
+**Hint:** Most popular programming languages have packages that can parse FASTA files automatically. 
+
+### BLAST the sample sequences against the reference VSG database
+
+Find the relevant BLAST command on the [longread-application repository][2]. Then adapt this command in the following ways:
+
+1. Change the input file name to *your* assigned sample file (see @tbl-groups).
+
+2. Change the output file name to something containing *your* sample label (see @tbl-groups).
+
+3. What does the paramater `-max_target_seq` do and why was it set to 1?
+
+4. Use a tabular output format *without* comments that includes *only* the following columns:
+   - Query sequence id
+   - Subject sequence id
+   - Raw score
+   - Bit score
+   - E-value
+   - Query sequence length
+   - Subject sequence length
+   - Alignment length
+   - Start of alignment in subject
+   - End of alignment in subject
+   - Number of identical matches
+   - Number of mismatches
+   - Total number of gaps
+   - Percentage of positive-scoring matches
+
+Include the exact BLAST command you ran in your report.
+
+### Analyze the BLAST output
+
+Answer the following questions / perform the following tasks:
+
+1. What is the number of sequences in *your* blast output file? Is it the same as in the input file?<br>
+   **Hint:** Import the blastn output file into a DataFrame.
+
+2. We define the alignment coverage as the percentage of the subject sequence covered by the alignment. Compute the alignment coverage for all sequences from the blastn output.
+
+3. Visualize the distribution of alignment coverages as a histogram.
+
+4. Remove alignments with coverage less than 60% and verify that each query sequence is now aligned to at most one subject sequence.
+
+5.  The bit score $S'$ is derived from the raw score $S$ using the formula
+   $$
+   S' = \frac{\lambda S - \ln K}{\ln 2}
+   $$
+   Can you find the values of $\lambda$ and $K$ from your blast results?<br>
+   **Hint:** Plot the bit scores against the raw scores.
+
+### Count VSG expression levels
+
+
+Perform the following tasks:
+
+1. Extract the unique VSG ids in *your* sample from your (filtered) BLAST results.
+
+2. For each unique VSG: count the number of sequences aliging to that VSG, and the average number of identical matches, mismatches, and gaps for its alignments.<br>
+   **Hint:** Using the split-apply-combine strategy, these numbers can be computed in one line of code.
+
+3. Identify the 10 most abundant VSGs in *your* sample and visualize their relative expression levels in a pie chart and compare your result against [Figure 3](https://doi.org/10.1371/journal.pntd.0007262.g003) of the [paper][1].
+
+4. Write a paragraph in your report that describes the figures and your interpretation of them.
+
+### Identify open reading frames
+
+Perform the following tasks:
+
+1. Find the relevant `getorf` command on the [longread-application repository][2] and adapt it to work on *your* input sample. Include the exact `getorf` command in your report.
+
+2. Count the percentage of reads in *your* sample that result in a predicted ORF with a minimum size of 1200 nucleotides.
+
+3. Which explanation was proposed in the [paper][1] for this low percentage?
+
+[1]: https://doi.org/10.1371/journal.pntd.0007262
+[2]: https://github.com/siddharthjayaraman/longread-application

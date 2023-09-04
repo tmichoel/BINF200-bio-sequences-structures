@@ -2,6 +2,7 @@
 /.vscode
 _site/
 .jupyter_cache
+assignments/*_files/
 
 ################################################################################
 #                          DrWatson Project Structure                          #
