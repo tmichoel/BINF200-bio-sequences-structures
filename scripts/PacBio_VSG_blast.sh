@@ -4,9 +4,10 @@
 sampledir=../data/PacBio_VSG
 cd $sampledir
 
+# Database file
 dbf=TREU927-v26_VSGTranscripts/TREU927-v26_VSGTranscripts.fasta
 
-# Run for all sample files or specify specific file 
+# Run for all sample files
 for qf in filtered_reads/PacBio_VSG_filtered_reads_*.fasta
 do 
     # Sample name
@@ -15,7 +16,7 @@ do
     # Blast output file name
     of=blastn/PacBio_VSG_filtered_reads_blastn_$sample.txt
     # Blast command
-    #blastn  -query $qf -db $dbf -out $of  -max_target_seqs 1 -outfmt '6 qseqid sseqid score bitscore evalue qlen slen length sstart send nident mismatch gaps positive'
+    blastn  -query $qf -db $dbf -out $of  -max_target_seqs 1 -outfmt '6 qseqid sseqid score bitscore evalue qlen slen length sstart send nident mismatch gaps positive'
     # ORF file name
     orf=orf/PacBio_VSG_filtered_reads_ORF_$sample.fasta
     # GetORF command

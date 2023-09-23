@@ -32,6 +32,7 @@ begin
 	using StatsPlots
 	using LaTeXStrings
 	using PlutoUI
+	using Downloads
 end
 
 # ╔═╡ e355a610-4af8-11ee-29f9-d916ed9c2903
@@ -52,7 +53,7 @@ md"""
 # ╔═╡ f3637e6c-2984-47e5-a0c0-394f3bdd2cae
 begin
 	filtered_reads = Vector{FASTARecord}();
-	   FASTAReader( open(datadir("PacBio_VSG", "filtered_reads", "PacBio_VSG_filtered_reads_" * sample[1] * ".fasta")) ) do reader
+   FASTAReader( open(datadir("PacBio_VSG", "filtered_reads", "PacBio_VSG_filtered_reads_" * sample[1] * ".fasta")) ) do reader
 	      for record in reader
 	         push!(filtered_reads, record);
 	      end
@@ -82,7 +83,7 @@ where
 
 - `qf` is the input file name PacBio\_VSG\_filtered\_reads\_ $(sample).fasta
 - `of` is the output file name PacBio\_VSG\_filtered\_reads\_blastn\_$(sample).txt
-- `dbf` is the database file name TREU927-v26_VSGTranscripts.fasta
+- `dbf` is the database file name TREU927-v26\_VSGTranscripts/TREU927-v26\_VSGTranscripts.fasta
 """
 
 # ╔═╡ 6314b615-22a9-4aa4-8b59-614281426e80
@@ -153,7 +154,7 @@ df_hc = subset(df, :alignment_coverage => x -> x.>= 0.6)
 md"""
 **4. Remove alignments with coverage less than 60% and verify that each query sequence is now aligned to at most one subject sequence.**
 
-Most alignments have high coverage, but **$(sum(df.alignment_coverage .< 0.6))** have coverage below 60%. We create a new DataFrame keeping only the high-coverage (>= 60%). The number of rows in the filtered DataFrame (**$(nrow(df_hc))**) is indeed the same as the number of input sequences (**$(length(filtered_reads))**)
+Most alignments have high coverage, but **$(sum(df.alignment_coverage .< 0.6))** have coverage below 60%. We create a new DataFrame keeping only the high-coverage (>= 60%). The number of rows in the filtered DataFrame is **$(nrow(df_hc))**, compared to the total number of input sequences, which was **$(length(filtered_reads))**.
 """
 
 # ╔═╡ 8c27c535-e079-4fda-8bba-2eeaaab4c7ea
@@ -190,6 +191,9 @@ Once we know the slope, the intercept ``b`` is found from ``b = y_2 - a x_2``. A
 Applied to the score formula, we see that the slope parameter is given ``a=\frac{\lambda}{\ln 2}``, which results in the value **``\lambda=``$(λ)**, and the intercept parameter by ``b=-\frac{\ln K}{\ln 2}``, which results in the value **``K=``$(K)**.
 """
 
+# ╔═╡ 44027cb8-0a54-42cb-baa3-0c56cbf661e9
+y2-a*x2
+
 # ╔═╡ ce28181d-db1c-4521-a6e3-17ec9386dcd6
  vsg = unique(df_hc.sseqid)
 
@@ -213,7 +217,6 @@ Grouping the DataFrame by the subject sequence id (that is, by VSG) and using th
 begin
 	df_vsg = combine( groupby(df_hc, :sseqid) , nrow,  :nident => mean, :mismatch => mean, :gaps => mean);
 	rename!(df_vsg, :sseqid => "VSG", :nrow => "count");
-#	rename!(df_vsg, ["VSG", "count"]);
 end
 
 # ╔═╡ d586e716-545a-4e21-8b52-aaea737fcdd4
@@ -247,6 +250,25 @@ where
 - `orf` is the output file name PacBio\_VSG\_filtered\_reads\_ORF\_$(sample).fasta
 """
 
+# ╔═╡ 096919e9-e4a8-40fc-9434-8d1937e31c04
+begin
+	predicted_orfs = Vector{FASTARecord}();
+	   FASTAReader( open(datadir("PacBio_VSG", "orf", "PacBio_VSG_filtered_reads_ORF_" * sample[1] * ".fasta")) ) do reader
+	      for record in reader
+	         push!(predicted_orfs, record)
+	      end
+	   end
+end
+
+# ╔═╡ 932e630c-47c9-49c0-9139-04eab4effbdf
+length(predicted_orfs)
+
+# ╔═╡ aa2901b6-188f-4594-8b7e-b6dea446e0e4
+length(filtered_reads)
+
+# ╔═╡ ac37c9f6-b878-4c11-8bf3-5bc03b473443
+100 * length(predicted_orfs) / length(filtered_reads)
+
 # ╔═╡ Cell order:
 # ╟─e355a610-4af8-11ee-29f9-d916ed9c2903
 # ╠═9ddcb453-89eb-4642-b313-40d9f2548d7c
@@ -274,6 +296,7 @@ where
 # ╟─c6a0eade-d189-4de6-b06f-39a23e094708
 # ╠═8c27c535-e079-4fda-8bba-2eeaaab4c7ea
 # ╠═bc8dcde6-ba0a-4a69-a77f-19777724c57c
+# ╠═44027cb8-0a54-42cb-baa3-0c56cbf661e9
 # ╟─51a53766-c67f-46bf-9724-53b1eb420258
 # ╠═ce28181d-db1c-4521-a6e3-17ec9386dcd6
 # ╟─f9e62367-ca9d-49a4-b576-ddcd3ed3f917
@@ -282,3 +305,7 @@ where
 # ╠═a06a7f65-aedd-40d9-8e03-02143fbf290e
 # ╠═f866826f-c4e2-4111-89b9-22071a53de92
 # ╟─b78bb3c7-46c2-4ecd-8c50-f7fd0fa740bb
+# ╠═096919e9-e4a8-40fc-9434-8d1937e31c04
+# ╠═932e630c-47c9-49c0-9139-04eab4effbdf
+# ╠═aa2901b6-188f-4594-8b7e-b6dea446e0e4
+# ╠═ac37c9f6-b878-4c11-8bf3-5bc03b473443

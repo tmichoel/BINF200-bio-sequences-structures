@@ -1,16 +1,25 @@
 ---
 title: "BINF200 Assignment 1"
 author: Tom Michoel
-date: 2023-09-14
+date: 2023-09-04
 published-title: Due date
 number-sections: true
 link-external-icon: true
+format:
+   pdf: 
+      papersize: a4
 ---
-## Grading and report
+## Deadline, grading and report
 
-The assignment is scored on 10 points and counts towards 10% of the final grade.
+The assignment is due **15 September 2023**.
 
-Your report should be a single PDF file that contains your report text, code, and figures in a single doc
+The assignment is scored on **20 points** and counts towards **10% of the final grade**.
+
+Your report should be a **single PDF file** that contains your report text, code, and figures in a single document. The easiest workflow is probably to run your analyses in a Jupyter or similar notebook, and save the final notebook as a PDF file. 
+
+You *may* work together, but you *must* declare it in your report. (You *cannot* work together if you are assigned to the *same* assignment group, see @sec-data below, but this affects only 2 people and can be fixed if required.)
+
+Any use of ChatGPT or other generative AI tools *must* be declared in your report.
 
 ## Background
 
@@ -18,7 +27,7 @@ In this assignment you will analyze data from the following paper:
 
 S. Jayaraman *et al.* (2019), [Application of long read sequencing to determine expressed antigen diversity in Trypanosoma brucei infections][1], PLOS Neglected Tropical Diseases 13(4): e0007262.
 
-You will need a copy of the paper to answer some of the assignment question.
+You will need a copy of the paper to answer some of the assignment questions.
 
 The paper has an accompanying [Github repository][2] where you will find some useful commands.
 
@@ -26,25 +35,32 @@ The paper has an accompanying [Github repository][2] where you will find some us
 
 You will need the following software to solve the assignment:
 
-1. **BLAST+**: Install the NCBI command line standalone BLAST+ programs following the [online instructions](https://www.ncbi.nlm.nih.gov/books/NBK52640/). 
+1. **BLAST+**: Install the NCBI command line standalone BLAST+ programs following either the [online instructions](https://www.ncbi.nlm.nih.gov/books/NBK52640/), or:
    - On Windows, installation in the [Windows Subsystem for Linux](https://learn.microsoft.com/en-us/windows/wsl/) will be easier than following the above instructions.
    - For Ubuntu (and hence also WSL), there exists a package "ncbi-blast+"  not listed on the NCBI page, which you can install directly using `apt-get install`.
 
 2. **GetORF**: Install the [getorf](https://bio.tools/getorf) tool. The [installation instructions](http://emboss.open-bio.org/html/adm/ch01s01.html) are a bit tedious, but you should get there in the end. Again, on Windows, installation in the WSL will be easier.
+   - If at the [configure step](http://emboss.open-bio.org/html/adm/ch01s03.html) you get an error about "X11", then rerun the `configure` command with option `--without-x`
 
 3. **Programming language**: You may use any language: Python, Julia, R, ...
 
-4. **Packages** for reading FASTA-formatted files and importing and manipulating DataFrames. Find and install them for your preferred programming language. 
+4. **Packages for reading FASTA-formatted files and importing and manipulating DataFrames**: Find and install them for your preferred programming language. 
 
-5. **Data analysis and visualization, report writing**: Use [JupyterLab](https://jupyter.org/) (or Jupyter notebooks) and/or an IDE such as [Visual Studio Code](https://code.visualstudio.com/) for data analysis and visualization. Using [Quarto](https://quarto.org/) you can integrate your notebooks, data visualization, and final report all in a markdown document. [Pluto](https://plutojl.org/) notebooks for Julia offer nice reactive features. 
+5. **Data analysis and visualization, report writing**: You can use [JupyterLab](https://jupyter.org/) (or Jupyter notebooks) and/or an IDE such as [Visual Studio Code](https://code.visualstudio.com/) for data analysis and visualization. Using [Quarto](https://quarto.org/) you can integrate your code, data visualization, and final report all in a markdown document. [Pluto](https://plutojl.org/) notebooks for Julia offer nice reactive features.
 
 ## Sequence data {#sec-data}
 
-All data for the assignment are available on [UiB OneDrive](https://universityofbergen-my.sharepoint.com/:f:/g/personal/tom_michoel_uib_no/EphdekZYkYBJnqYKRcpoOfsBJBouvZhTOQEorETwKBHGsA?e=roErlx) in the **PacBio VSG** folder. You will need to login with your UiB account to obtain access. You will need the following files:
+All data for the assignment are available on [UiB OneDrive](https://universityofbergen-my.sharepoint.com/:f:/g/personal/tom_michoel_uib_no/EphdekZYkYBJnqYKRcpoOfsBJBouvZhTOQEorETwKBHGsA?e=roErlx) in the **PacBio VSG** folder. You will need to login with your UiB account to obtain access. Find and download the following files:
 
-1. A database of known VSG genes. Download the entire folder **TREU927-v26_VSGTranscripts**.
+1. A database of known VSG genes. Download the entire folder named
+ 
+   **TREU927-v26_VSGTranscripts**.
 
-2. Sequencing data from **one** sample (**one** file) named  **PacBio_VSG_filtered_reads_*sample_name*.fasta**. Twenty such files, for 20 samples (individual mice), are available in total. To find out which one *you* should download:
+2. Sequencing data from **one** sample (**one file**) named 
+
+   **PacBio_VSG_filtered_reads_*sample_name*.fasta**. 
+ 
+   Twenty such files, for 20 samples (individual mice), are available in total. To find out which one *you* should download:
 
    1. Go to the **Groups** page on Mitt ([https://mitt.uib.no/courses/42444/groups](https://mitt.uib.no/courses/42444/groups))
    2. Select the **Compulsory Assignment 1 - Sample** tab and find to which group you have been (randomly) assigned.
@@ -69,22 +85,34 @@ All data for the assignment are available on [UiB OneDrive](https://universityof
 
 ## Tasks
 
-### Show that you understand the BLAST+ package
+### Briefly describe your programming experience (optional, ungraded)
+
+Briefly describe your experience with:
+
+- The Unix command line
+- Python programming and package management
+- Data input/output and DataFrames in Python
+- Jupyter notebooks, VS Code
+
+If you are comfortable with all of the above and did not experience any particular problems during the software installation or reading and processing of the sequence data, you can skip this task.
+
+
+
+### Show that you understand the BLAST+ package (2 points)
 
 The BLAST+ package contains five **core blast search programs**. 
 
 1. List all five core blast search programs.
 2. Explain the difference between **blastn** and **blastp**.
 
-### Show that you understand the biological experiment and data
+### Show that you understand the biological experiment and data  (2 points)
 
 Write a short paragraph in your own words to explain the biological experiment that was done to generate the sequence data (see the [publication][1]), what sequences are contained in the **PacBio_VSG_filtered_reads_*sample_name*.fasta** files, and what sequences are contained in the **TREU927-v26_VSGTranscripts** database.
 
-Answer the following question: What is the number of sequences in *your* input file?
-
+Answer the following question: What is the number of sequences in *your* input file?<br>
 **Hint:** Most popular programming languages have packages that can parse FASTA files automatically. 
 
-### BLAST the sample sequences against the reference VSG database
+### BLAST the sample sequences against the reference VSG database  (4 points)
 
 Find the relevant BLAST command on the [longread-application repository][2]. Then adapt this command in the following ways:
 
@@ -112,14 +140,14 @@ Find the relevant BLAST command on the [longread-application repository][2]. The
 
 Include the exact BLAST command you ran in your report.
 
-### Analyze the BLAST output
+### Analyze the BLAST output  (5 points)
 
 Answer the following questions / perform the following tasks:
 
 1. What is the number of sequences in *your* blast output file? Is it the same as in the input file?<br>
-   **Hint:** Import the blastn output file into a DataFrame.
+   **Hint:** Import the BLAST output file into a DataFrame.
 
-2. We define the alignment coverage as the percentage of the subject sequence covered by the alignment. Compute the alignment coverage for all sequences from the blastn output.
+2. We define the alignment coverage as the percentage of the subject sequence covered by the alignment. Compute the alignment coverage for all sequences from the BLAST output.
 
 3. Visualize the distribution of alignment coverages as a histogram.
 
@@ -129,10 +157,10 @@ Answer the following questions / perform the following tasks:
    $$
    S' = \frac{\lambda S - \ln K}{\ln 2}
    $$
-   Can you find the values of $\lambda$ and $K$ from your blast results?<br>
+   Can you find the values of $\lambda$ and $K$ from your BLAST results?<br>
    **Hint:** Plot the bit scores against the raw scores.
 
-### Count VSG expression levels
+### Count VSG expression levels  (4 points)
 
 
 Perform the following tasks:
@@ -142,11 +170,11 @@ Perform the following tasks:
 2. For each unique VSG: count the number of sequences aliging to that VSG, and the average number of identical matches, mismatches, and gaps for its alignments.<br>
    **Hint:** Using the split-apply-combine strategy, these numbers can be computed in one line of code.
 
-3. Identify the 10 most abundant VSGs in *your* sample and visualize their relative expression levels in a pie chart and compare your result against [Figure 3](https://doi.org/10.1371/journal.pntd.0007262.g003) of the [paper][1].
+3. Identify the 10 most abundant VSGs in *your* sample, visualize their relative expression levels in a pie chart, and compare your result against [Figure 3](https://doi.org/10.1371/journal.pntd.0007262.g003) of the [paper][1].
 
-4. Write a paragraph in your report that describes the figures and your interpretation of them.
+4. Write a paragraph in your report that describes the figure and your interpretation of it.
 
-### Identify open reading frames
+### Identify open reading frames  (3 points)
 
 Perform the following tasks:
 
@@ -155,6 +183,16 @@ Perform the following tasks:
 2. Count the percentage of reads in *your* sample that result in a predicted ORF with a minimum size of 1200 nucleotides.
 
 3. Which explanation was proposed in the [paper][1] for this low percentage?
+
+## Bonus questions (ungraded)
+
+If the previous tasks were too easy or you would like to have more fun with the data, try the following (ranked by increasing difficulty):
+
+1. Repeat your analysis for a different sample and compare the results.
+
+2. Reproduce Figure 2B,C from the [paper][1] using a day 3 or day 6 sample. This will require a new BLAST command where you keep the full alignment to compute the number of identical matches, mismatches, and gaps (deletions) *per nucleotide*.
+
+3. Reproduce Figure 5 from the [paper][1] using a day 12 sample. This will require a new BLAST command where you keep *all* alignments for each query sequence and a few post-processing steps to identify likely mosaics as described in the [paper][1].
 
 [1]: https://doi.org/10.1371/journal.pntd.0007262
 [2]: https://github.com/siddharthjayaraman/longread-application
