@@ -1,0 +1,28 @@
+---
+title: "BINF200 Self-Evaluation H2023"
+author: Tom Michoel
+date: today
+number-sections: true
+link-external-icon: true
+format:
+   pdf: 
+      papersize: a4
+---
+1. MolBio lecture bit boring list of facts.
+   - Ask someone with molbio background to teach something more lively
+   - Give reading assignment and molbio quiz that must be passed instead of lecture 
+
+2. Need lecture on Unix command line, Pandas (dataframes, split-apply-combine), BioPython/SeqIO before Assignment 1. Can replace RNA-seq lecture.
+
+3. Assignment 2 needs task about sequence motifs.
+
+4. Weekly exercises to practice *all* topics.
+
+5. Order modules DNA -> RNA -> protein. 
+
+6. Motif discovery lecture (EM, Gibbs sampler) needs proper structure
+   - General idea of cycling between given start sites, update PWM, and given PWM, update start sites
+   - Representing starting positions and PWMs
+   - Generative model $P(seq \mid PWM, starting pos)$
+   - EM
+   - Gibbs sampling   
