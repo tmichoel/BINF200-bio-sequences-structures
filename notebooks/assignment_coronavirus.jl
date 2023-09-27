@@ -22,6 +22,7 @@ begin
 	using StatsPlots
 	using LaTeXStrings
 	using LinearAlgebra
+	using Random
 	using PlutoUI
 end
 
@@ -158,18 +159,20 @@ md"""
 We will store the pairwise similarities in the upper diagonal of a square matrix. Note that in the next task we will need self-alignment scores, and these are therefore included on the diagonal.
 """
 
-# ╔═╡ 3f1013ac-7c8a-489a-810f-65a7e77a2c7e
-begin
-	N = length(protein_N_data);
+# ╔═╡ af109968-cab5-4603-8a44-a044abf1fae2
+function pairalign_vec(seq, scoremodel)
+	N = length(seq);
 	S = zeros(N,N);
 	for i = 1:N
 		for j = i:N
-			seq1 = FASTX.sequence(protein_N_data[i]);
-			seq2 = FASTX.sequence(protein_N_data[i]);
-			S[i,j] = score( pairalign(GlobalAlignment(), seq1, seq2, scoremodel) )
+			S[i,j] = score( pairalign(GlobalAlignment(), seq[i], seq[j], scoremodel) )
 		end
 	end
+	return S
 end
+
+# ╔═╡ fdf16615-3a4e-4961-bf42-3f78312e6efe
+S = pairalign_vec(FASTX.sequence.(protein_N_data), scoremodel)
 
 # ╔═╡ 18bb5a3f-2cb2-4cb3-8e4e-28396f3f6ed3
 md"""
@@ -186,7 +189,12 @@ where
 - ``S_{obs}`` is the observed pairwise alignment score
 - ``S_{max}`` is the best alignment score for both sequences, obtained by taking the average of the score of aligning either sequence to itself
 - ``S_{rand}`` is the expected (average) score for aligning two random sequences of the same length and residue composition, obtained by random shuffling the nucleotide composition of the two sequences. (Hint: more info about the Feng & Doolittle can be found at this URL: [https://rna.informatik.uni-freiburg.de/Teaching/index.jsp?toolName=Feng-Doolittle](https://rna.informatik.uni-freiburg.de/Teaching/index.jsp?toolName=Feng-Doolittle))
+
+We compute ``S_{rand}`` as the average over 10 random permutations. We first need a function that shuffles all sequences in our input data.
 """
+
+# ╔═╡ 79fc37e8-d9ee-43f9-9dc3-2d786ee92fbf
+seqs = FASTX.sequence.(protein_N_data)
 
 # ╔═╡ Cell order:
 # ╟─f503ce8e-5d23-11ee-0b33-f73001d28c23
@@ -206,5 +214,7 @@ where
 # ╟─4c9719eb-43c0-437a-8264-a4a9fb6d3b20
 # ╠═fe340d20-3ce2-43f9-81aa-185e7b7c7edb
 # ╟─4eed04b6-39d3-4d9c-9d12-3bb6bf566fec
-# ╠═3f1013ac-7c8a-489a-810f-65a7e77a2c7e
+# ╠═af109968-cab5-4603-8a44-a044abf1fae2
+# ╠═fdf16615-3a4e-4961-bf42-3f78312e6efe
 # ╟─18bb5a3f-2cb2-4cb3-8e4e-28396f3f6ed3
+# ╠═79fc37e8-d9ee-43f9-9dc3-2d786ee92fbf
