@@ -25,6 +25,18 @@ Any use of ChatGPT or other generative AI tools *must* be declared in your repor
 
 In this compulsory assignment, you will perform bioinformatics analyses covering multiple sequence alignment, phylogenetic tree construction and motif finding. The assignment will cover practical use of state-of-the-art tools, and also questions requiring programming. You may use any programming language: Python, Julia, R, ...
 
+## Data
+
+Download all files in the following OneDrive folder:
+
+[https://universityofbergen-my.sharepoint.com/:f:/r/personal/tom_michoel_uib_no/Documents/public/BINF200/Coronavirus?csf=1&web=1&e=D5umem](https://universityofbergen-my.sharepoint.com/:f:/r/personal/tom_michoel_uib_no/Documents/public/BINF200/Coronavirus?csf=1&web=1&e=D5umem)
+
+You should find the following files:
+
+- **protein_N_data.fasts** - Sequences of the gene coding for coronavirus nucleocapsid (N) protein in a number of coronaviruses
+- **GCA_011537005.1_partial_genomic.fasta** - Part of the BetaCoV/Wuhan/IPBCAMS-WH-02/2019 genome
+- **motifCountMatrix.csv** - Count matrix of a sequence motif
+
 ## Tasks
 
 ### Multiple sequence alignment and phylogenetic tree construction for the coronavirus nucleocapsid protein
@@ -39,10 +51,6 @@ We will focus on different genera of corona viruses namely: alpha, beta, gamma a
 - Delta coronavirus: [https://www.ncbi.nlm.nih.gov/datasets/taxonomy/1159901/](https://www.ncbi.nlm.nih.gov/datasets/taxonomy/1159901/)
 
 For simplicity, we will use data from only one important gene, that encodes the coronavirus nucleocapsid (N) protein. This is a structural protein that forms complexes with genomic RNA, interacts with the viral membrane protein during virion assembly and plays a critical role in enhancing the efficiency of virus transcription and assembly. You can read more about it in the paper [*The SARS-CoV-2 Nucleocapsid Protein and Its Role in Viral Structure, Biological Functions, and a Potential Target for Drug or Vaccine Mitigation*](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8227405/).
-
-Download a dataset (**protein_N_data.fasta**) with the sequences of interest from [OneDrive](https://universityofbergen-my.sharepoint.com/:f:/r/personal/tom_michoel_uib_no/Documents/public/BINF200/Coronavirus-protein-N?csf=1&web=1&e=RINJI2) or copy this URL:
-
-[https://universityofbergen-my.sharepoint.com/:f:/r/personal/tom_michoel_uib_no/Documents/public/BINF200/Coronavirus-protein-N?csf=1&web=1&e=RINJI2](https://universityofbergen-my.sharepoint.com/:f:/r/personal/tom_michoel_uib_no/Documents/public/BINF200/Coronavirus-protein-N?csf=1&web=1&e=RINJI2)
 
 The following datasets were used to create **protein_N_data.fasta**:
 
@@ -67,26 +75,95 @@ From the sequences in **protein_N_data.fasta**, find the sequence for which the 
 
 Build a multiple sequence alignment for the **protein_N_data** using a multiple sequence alignment tool of your choice. (Hint: check out the services provided by EMBL's European Bioinformatics Institute (EMBL-EBI).)
 
-#### Phylogenetic tree reconstruction
+#### Phylogenetic tree reconstruction {#sec-phylo-1}
 
 Based on the results from the previous step, build a phylogenetic tree. (Hint: at this stage it is not required to make an “advanced tree”, providing a simple tree is enough). Save the image of the phylogenetic/guide tree.
 
 #### Interpretation
 
-Based on the results from the previous two steps, what do you see? Please elaborate with a small text (3-4 lines), and explain what you observe from the multiple sequence alignment itself (hint: check the number of conserved sites), and give a short interpretation of the phylogenetic tree you have constructed.
+Based on the results from the previous two steps, what do you see? Elaborate with a small text (3-4 lines): Explain what you observe from the multiple sequence alignment itself (hint: check the number of conserved sites), and give a short interpretation of the phylogenetic tree you have constructed.
 
-### Implementation of multiple sequence alignment and phylogenetic tree construction using UPGMA
+### Step-by-step multiple sequence alignment and phylogenetic tree construction using UPGMA
 
-#### Implement the Needleman-Wunsch alignment algorithm
+#### Compute pairwise similarities 
 
-Write a function to build a matrix of global alignment scores of each pair of sequences using Needleman-Wunsch alignment. A python sample code (**Needleman_Wunsch.py**) is provided for the Needleman-Wunsch alignment using two input sequences, but you are free to use any other implementation or pseudo code you like.
+Use the Needleman-Wunsch (dynamic programming) pairwise alignment algorithm to build a matrix of global alignment scores for each pair of sequences in **protein_N_data.fasta**. You can choose between multiple options:
 
-#### Implement the Feng-Doolittle progressive alignment algorithm
+- Implement the Needleman-Wunsch algorithm yourself. (Hint: You have probably done this already in BINF100) 
+- Use an existing implementation of the algorithm. (Hint: Check biopython, biojulia)
+- Use the *needleall* command line program from the EMBOSS suite. (Hint: You installed the whole EMBOSS suite for Assignment 1.)
+- Use a webserver such as EMBL-EBI's EMBOSS Needle service. (Hint: Manually inputting every pair of sequences will be extremely tedious, though they do provide APIs.)
 
-Write a function to generate a distance matrix from the score matrix you have created in the previous step. For this task we will use Feng & Doolittle formulation, and we will compute the distance $D$ using formula:
+#### Generate a pairwise distance matrix
+
+Generate a distance matrix from the score matrix you have created in the previous step. For this task we will use Feng & Doolittle's formulation, and we will compute the distance $D$ using formula:
 
 $$
-D = -\log S_{eff} = -log \frac{S_{obs}-S_{rand}}{S_{max - S_{rand}}}
+D = -\log S_{eff} = -\log \frac{S_{obs}-S_{rand}}{S_{max} - S_{rand}}
 $$
 
-where  $S_{obs}$  is the observed pairwise alignment score; $S_{max}$ provides the best alignment score for both sequences, by taking the average of the score of aligning either sequence to itself; and $S_{rand}$ is the expected score for aligning two random sequences of the same length and residue composition. S(rand) is calculated by random shuffling the nucleotide composition of the two sequences. (Hint: more info about the Feng & Doolittle can be found here https://rna.informatik.uni-freiburg.de/Teaching/index.jsp?toolName=Feng-Doolittle)
+where 
+
+- $S_{obs}$ is the observed pairwise alignment score
+- $S_{max}$ is the best alignment score for both sequences, obtained by taking the average of the score of aligning either sequence to itself
+- $S_{rand}$ is the expected (average) score for aligning two random sequences of the same length and residue composition, obtained by random shuffling the nucleotide composition of the two sequences. (Hint: more info about the Feng & Doolittle can be found at this URL: [https://rna.informatik.uni-freiburg.de/Teaching/index.jsp?toolName=Feng-Doolittle](https://rna.informatik.uni-freiburg.de/Teaching/index.jsp?toolName=Feng-Doolittle))
+
+#### Generate a "guide tree" of phylogenetic relationships
+
+Generate a "guide tree" of phylogenetic relationships from the pairwise distance matrix you have created in the previous step using the UPGMA method. You can choose between multiple options:
+
+- Implement the UPGMA hierarchical clustering algorithm yourself. (Hint: You can represent the tree as a binary tree, either implementing a tree class yourself, or using an existing data structure.)
+- Use an existing implementation of the algorithm. (Hint: UPGMA is more commonly known as hierarchical clustering with average linkage. Check SciPy or similar packages for other languages.)
+
+#### Interpret your results
+
+Visualize your guide tree and compare it to the phylogenetic tree constructed in @sec-phylo-1. Elaborate with a small text (3-4 lines) to explain what you observe.
+
+
+### Sequence motifs
+
+Do simple motif searching on corona virus sequences using the input dataset (**protein_N_data.fasta**) we have already analysed.
+
+#### MEME analysis
+
+Connect to the MEME platform at [https://meme-suite.org/](https://meme-suite.org/).
+
+- Find the MEME motif discovery tool.
+- Input **protein_N_data.fasta** to discover enriched motifs in this set of sequences, allowing for zero or one motif occurrence per sequence and finding upto 5 motifs. Which discovery mode, sequence alphabet, and site distribution options do you select?
+
+Open and download the **MEME HTML output file** and include the sequence logos of the motifs found in your report.
+
+#### Convert count matrix to PWM
+
+We will work with a 20-nucleotide subset of the first motif found by the MEME software, given by the count matrix:
+
+![Motif count matrix](assgn2_motif_counts.png)
+
+The count matrix is also available as a file **motifCountMatrix.csv**.
+
+1. Compare the count matrix against your sequence logos and mark the 20-nucleotide window corresponding to this count matrix in the right logo.
+
+2. Convert the count matrix to a position-specific probability matrix (PPM) $P$. To avoid zeros in the PPM, we add *pseudo-counts* and define
+
+   $$
+   P_{k,i} = \frac{\text{Count}_{k,i} + 0.25 * \sqrt{N}}{N + \sqrt{N}},
+   $$
+
+   where $\text{Count}_{k,i}$ is the value of the count matrix for nucleotide $k$ in motif position $i$, and $N$ is the number of sequences in **protein_N_data.fasta** (Hint: Count the totals in each column of the count matrix).
+
+3. Convert the PPM matrix to a position-specific weight matrix (PWM) $W$ using the formula
+
+   $$
+   W_{k,i} = \log_2 \frac{P_{k,i}}{0.25}
+   $$
+
+   What would be the value of $W$ for a random background site with equal counts for all nucleotides and using the pseudo-count formula above to compute the random probabilities? 
+
+
+#### Scan a coronavirus genome for motif occurrences
+
+Scan part of the BetaCoV/Wuhan/IPBCAMS-WH-02/2019 genome (the sequence in the file **GCA_011537005.1_partial_genomic.fasta**) and score all possible motif occurrences. Use the sliding window approach presented in the lecture and report (table and figure) both the log-odds score and the odds of each possible motif starting position in the genome sequence.
+
+Elaborate with a small text (3-4 lines) to explain what you observe.
+
+
