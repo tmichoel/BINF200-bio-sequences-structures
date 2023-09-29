@@ -1,7 +1,7 @@
 ---
 title: "BINF200 Assignment 2"
 author: Tom Michoel
-date: 2023-09-26
+date: today
 published-title: Due date
 number-sections: true
 link-external-icon: true
@@ -52,7 +52,7 @@ We will focus on different genera of corona viruses namely: alpha, beta, gamma a
 
 For simplicity, we will use data from only one important gene, that encodes the coronavirus nucleocapsid (N) protein. This is a structural protein that forms complexes with genomic RNA, interacts with the viral membrane protein during virion assembly and plays a critical role in enhancing the efficiency of virus transcription and assembly. You can read more about it in the paper [*The SARS-CoV-2 Nucleocapsid Protein and Its Role in Viral Structure, Biological Functions, and a Potential Target for Drug or Vaccine Mitigation*](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8227405/).
 
-The following datasets were used to create **protein_N_data.fasta**:
+The datasets listed in Figure 1 were used to create **protein_N_data.fasta**.
 
 ![Table of coronavirus source datasets](assgn2_coronavirus_table.png)
 
@@ -64,7 +64,7 @@ List the names of the sequences.
 
 #### Find protein N in a specific coronavirus genome
 
-From the sequences in **protein_N_data.fasta**, find the sequence for which the first letter in its name is closest in the alphabet to the **first letter in your first name**. If there are multiple sequences starting with the same letter, pick on arbitrarily. For the selected sequence:
+From the sequences in **protein_N_data.fasta**, find the sequence for which the first letter in its name is closest in the alphabet to the **first letter in your first name**. If there are multiple sequences starting with the same letter, pick one arbitrarily. For the selected sequence:
 
 - Find the assembly accession ID in the table above.
 - Go to the NCBI website (cf. links above) and find the corresponding genome assembly.
@@ -106,7 +106,12 @@ where
 
 - $S_{obs}$ is the observed pairwise alignment score
 - $S_{max}$ is the best alignment score for both sequences, obtained by taking the average of the score of aligning either sequence to itself
-- $S_{rand}$ is the expected (average) score for aligning two random sequences of the same length and residue composition, obtained by random shuffling the nucleotide composition of the two sequences. (Hint: more info about the Feng & Doolittle can be found at this URL: [https://rna.informatik.uni-freiburg.de/Teaching/index.jsp?toolName=Feng-Doolittle](https://rna.informatik.uni-freiburg.de/Teaching/index.jsp?toolName=Feng-Doolittle))
+- $S_{rand}$  is the expected (average) score for aligning two random sequences of the same length and residue composition, obtained by random shuffling the nucleotide composition of the two sequences. (Hint: more info about the Feng & Doolittle can be found at this URL: [https://rna.informatik.uni-freiburg.de/Teaching/index.jsp?toolName=Feng-Doolittle](https://rna.informatik.uni-freiburg.de/Teaching/index.jsp?toolName=Feng-Doolittle))
+
+
+Compute $S_{rand}$ by taking the average score of **10** pairwise alignments between random sequences with the same sequence compositions as the original sequences.
+
+
 
 #### Generate a "guide tree" of phylogenetic relationships
 

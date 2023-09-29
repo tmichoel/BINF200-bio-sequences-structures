@@ -14,10 +14,13 @@ using DrWatson
 begin
 	using BioSequences
 	using BioAlignments
+	using BioSymbols
 	using FASTX
 	using DataFrames
 	using CSV
 	using Plots
+	using Plots.PlotMeasures
+	using Clustering
 	using Statistics
 	using StatsPlots
 	using LaTeXStrings
@@ -72,7 +75,7 @@ A subset of viruses was used to create **protein\_N\_data.fasta**.
 
 #### Parse the fasta file
 
-How many sequences are contained in the file **protein_N_data.fasta**? List the names of the sequences.
+How many sequences are contained in the file **protein\_N\_data.fasta**? List the names of the sequences.
 """
 
 # ╔═╡ fbab5158-a837-4c70-ad47-cc526bd7461a
@@ -87,11 +90,13 @@ end
 
 # ╔═╡ db865d39-0a20-4103-822e-83d0a5f3d52c
 md"""
-There are $(length(protein_N_data)) sequences in the file. Their names are:
+*There are $(length(protein_N_data)) sequences in the file. Their names are:*
 """
 
 # ╔═╡ 5a1ce827-59d5-4ce8-9f27-1bc4d28c6eb8
-description.(protein_N_data)
+for seq = description.(protein_N_data)
+	println(seq)
+end
 
 # ╔═╡ 73877ecd-a6ff-40f9-a3f1-48dd6ab81bb6
 md"""
@@ -110,13 +115,13 @@ md"""
 
 Build a multiple sequence alignment for the **protein\_N\_data** using a multiple sequence alignment tool of your choice. (Hint: check out the services provided by EMBL's European Bioinformatics Institute (EMBL-EBI).)
 
-A good choice is [Clustal Omega](https://www.ebi.ac.uk/Tools/msa/clustalo/).
+*A good choice is [Clustal Omega](https://www.ebi.ac.uk/Tools/msa/clustalo/).*
 
 #### Phylogenetic tree reconstruction
 
 Based on the results from the previous step, build a phylogenetic tree. (Hint: at this stage it is not required to make an “advanced tree”, providing a simple tree is enough). Save the image of the phylogenetic/guide tree.
 
-After uploading **protein\_N\_data.fasta** and running Clustal Omega, the output page has a tab "Phylogenetic Tree". Here is a screenshot of the tree:
+*After uploading **protein\_N\_data.fasta** and running Clustal Omega, the output page has a tab "Phylogenetic Tree". Here is a screenshot of the tree:*
 
 $(PlutoUI.LocalResource("../figures/protein_N_data_clustalo_phylotree.png"))
 """
@@ -138,17 +143,9 @@ Use the Needleman-Wunsch (dynamic programming) pairwise alignment algorithm to b
 - Use the *needleall* command line program from the EMBOSS suite. (Hint: You installed the whole EMBOSS suite for Assignment 1.)
 - Use a webserver such as EMBL-EBI's EMBOSS Needle service. (Hint: Manually inputting every pair of sequences will be extremely tedious, though they do provide APIs.)
 
-Here we will use the [BioAlignments](https://github.com/BioJulia/BioAlignments.jl) package.
+*We will use the [BioAlignments](https://github.com/BioJulia/BioAlignments.jl) package.*
 
-First we set the score model. We can use something as simple as:
-"""
-
-# ╔═╡ b023d6bd-45f4-41ec-8922-1bf8500e8f53
-costmodel = CostModel(match=0, mismatch=1, insertion=1, deletion=1);
-
-# ╔═╡ 4c9719eb-43c0-437a-8264-a4a9fb6d3b20
-md"""
-Or use the popular [EDNAFULL](https://rosalind.info/glossary/dnafull/) substitution matrix: 
+*First we set the score model. Here we use the popular [EDNAFULL](https://rosalind.info/glossary/dnafull/) substitution matrix:*
 """
 
 # ╔═╡ fe340d20-3ce2-43f9-81aa-185e7b7c7edb
@@ -156,7 +153,7 @@ scoremodel = AffineGapScoreModel(EDNAFULL, gap_open=-5, gap_extend=-1);
 
 # ╔═╡ 4eed04b6-39d3-4d9c-9d12-3bb6bf566fec
 md"""
-We will store the pairwise similarities in the upper diagonal of a square matrix. Note that in the next task we will need self-alignment scores, and these are therefore included on the diagonal.
+*We will store the pairwise similarities in the upper diagonal of a square matrix. Note that in the next task we will need self-alignment scores, and these are therefore included on the diagonal.*
 """
 
 # ╔═╡ af109968-cab5-4603-8a44-a044abf1fae2
@@ -190,11 +187,91 @@ where
 - ``S_{max}`` is the best alignment score for both sequences, obtained by taking the average of the score of aligning either sequence to itself
 - ``S_{rand}`` is the expected (average) score for aligning two random sequences of the same length and residue composition, obtained by random shuffling the nucleotide composition of the two sequences. (Hint: more info about the Feng & Doolittle can be found at this URL: [https://rna.informatik.uni-freiburg.de/Teaching/index.jsp?toolName=Feng-Doolittle](https://rna.informatik.uni-freiburg.de/Teaching/index.jsp?toolName=Feng-Doolittle))
 
-We compute ``S_{rand}`` as the average over 10 random permutations. We first need a function that shuffles all sequences in our input data.
+Compute $S_{rand}$ by taking the average score of **10** pairwise alignments between random sequences with the same sequence compositions as the original sequences.
 """
 
-# ╔═╡ 79fc37e8-d9ee-43f9-9dc3-2d786ee92fbf
-seqs = FASTX.sequence.(protein_N_data)
+# ╔═╡ 81b0c557-9965-4ece-b2f4-9e3800bcc387
+function seq_freq(seq)
+	# we assume our input sequence is a string of DNA letters
+	alph = ['A','C','G','T']
+	if sort(unique(seq))!=alph
+		error("Non-ACGT detected.")
+	end
+	# create count vector
+	c = vec(map(x -> count(x,seq), alph))/length(seq)
+end
+
+# ╔═╡ 75c19231-4f64-42c3-831d-5c9d010f652f
+function random_score(seq1, seq2, scoremodel)
+	nr = 10
+	sp1 = SamplerWeighted(dna"ACGT", seq_freq(seq1)[1:3]);
+	sp2 = SamplerWeighted(dna"ACGT", seq_freq(seq2)[1:3]);
+	s = 0.0
+	for k=1:nr
+		rs1 = randseq(DNAAlphabet{2}(), sp1, length(seq1))
+		rs2 = randseq(DNAAlphabet{2}(), sp2, length(seq2))
+		s += score(pairalign(GlobalAlignment(), rs1, rs2, scoremodel))
+	end
+	s /= nr
+end
+
+# ╔═╡ bac7d343-e83f-4a89-87c1-0cf52e6547e4
+function random_pairalign_vec(seq, scoremodel)
+	N = length(seq);
+	S = zeros(N,N);
+	for i = 1:N
+		for j = i:N
+			S[i,j] = random_score(seq[i], seq[j], scoremodel)
+		end
+	end
+	return S
+end
+
+# ╔═╡ 4087cf53-c4c7-49e6-9148-1778f4d33f2c
+ Srand = random_pairalign_vec(FASTX.sequence.(protein_N_data), scoremodel)
+
+# ╔═╡ d2a53401-e003-4012-bdbd-5ff7d4712531
+md"""
+*Now compute ``S_{max}``, the average of the score of aligning either sequence to itself, as a matrix:*
+"""
+
+# ╔═╡ 60e20fe5-a39d-4b33-b386-4d8b574293a0
+Smax = triu(0.5*(diag(S)' .+ diag(S)))
+
+# ╔═╡ 76448d4e-2894-49a6-8f75-b75361e36927
+md"""
+*Finally compute the distance matrix:*
+"""
+
+# ╔═╡ 6e18f4f5-c51c-464d-b633-aa5a37df3a8a
+D = triu( -log.( (S .- Srand) ./ (Smax .- Srand) ) , 1)
+
+# ╔═╡ 0d3979ab-8f0e-476f-a623-8d9a15ce9af4
+md"""
+#### Generate a "guide tree" of phylogenetic relationships
+
+Generate a "guide tree" of phylogenetic relationships from the pairwise distance matrix you have created in the previous step using the UPGMA method. You can choose between multiple options:
+
+- Implement the UPGMA hierarchical clustering algorithm yourself. (Hint: You can represent the tree as a binary tree, either implementing a tree class yourself, or using an existing data structure.)
+- Use an existing implementation of the algorithm. (Hint: UPGMA is more commonly known as hierarchical clustering with average linkage. Check SciPy or similar packages for other languages.)
+
+*Here we use the second option:*
+"""
+
+# ╔═╡ 1a1df46a-66b0-4733-bebc-46f9896e7766
+hc = hclust(D, linkage=:average, branchorder=:optimal, uplo=:U)
+
+# ╔═╡ 404f6d5f-08ac-48c1-9178-73cd0bd3d051
+hc.order
+
+# ╔═╡ b22a39b7-a35b-4923-a18c-8fd630bb7fea
+description.(protein_N_data)
+
+# ╔═╡ bdb9ea2f-a22d-485c-b838-aec7703836fa
+begin
+	plot(hc, xrotation=90, bottom_margin = 50mm)
+	xticks!(1:20, description.(protein_N_data)[hc.order])
+end
 
 # ╔═╡ Cell order:
 # ╟─f503ce8e-5d23-11ee-0b33-f73001d28c23
@@ -210,11 +287,21 @@ seqs = FASTX.sequence.(protein_N_data)
 # ╟─73877ecd-a6ff-40f9-a3f1-48dd6ab81bb6
 # ╟─95d3c40f-c21a-4715-ac75-9ca5c9e9fa44
 # ╟─cbf62395-5f9a-41bf-bade-c32a021fbe60
-# ╠═b023d6bd-45f4-41ec-8922-1bf8500e8f53
-# ╟─4c9719eb-43c0-437a-8264-a4a9fb6d3b20
 # ╠═fe340d20-3ce2-43f9-81aa-185e7b7c7edb
 # ╟─4eed04b6-39d3-4d9c-9d12-3bb6bf566fec
 # ╠═af109968-cab5-4603-8a44-a044abf1fae2
 # ╠═fdf16615-3a4e-4961-bf42-3f78312e6efe
 # ╟─18bb5a3f-2cb2-4cb3-8e4e-28396f3f6ed3
-# ╠═79fc37e8-d9ee-43f9-9dc3-2d786ee92fbf
+# ╠═81b0c557-9965-4ece-b2f4-9e3800bcc387
+# ╠═75c19231-4f64-42c3-831d-5c9d010f652f
+# ╠═bac7d343-e83f-4a89-87c1-0cf52e6547e4
+# ╠═4087cf53-c4c7-49e6-9148-1778f4d33f2c
+# ╟─d2a53401-e003-4012-bdbd-5ff7d4712531
+# ╠═60e20fe5-a39d-4b33-b386-4d8b574293a0
+# ╟─76448d4e-2894-49a6-8f75-b75361e36927
+# ╠═6e18f4f5-c51c-464d-b633-aa5a37df3a8a
+# ╟─0d3979ab-8f0e-476f-a623-8d9a15ce9af4
+# ╠═1a1df46a-66b0-4733-bebc-46f9896e7766
+# ╠═404f6d5f-08ac-48c1-9178-73cd0bd3d051
+# ╠═b22a39b7-a35b-4923-a18c-8fd630bb7fea
+# ╠═bdb9ea2f-a22d-485c-b838-aec7703836fa
