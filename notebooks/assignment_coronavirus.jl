@@ -162,7 +162,7 @@ function pairalign_vec(seq, scoremodel)
 	S = zeros(N,N);
 	for i = 1:N
 		for j = i:N
-			S[i,j] = score( pairalign(GlobalAlignment(), seq[i], seq[j], scoremodel) )
+			S[i,j] = BioAlignments.score( pairalign(GlobalAlignment(), seq[i], seq[j], scoremodel) )
 		end
 	end
 	return S
@@ -210,7 +210,7 @@ function random_score(seq1, seq2, scoremodel)
 	for k=1:nr
 		rs1 = randseq(DNAAlphabet{2}(), sp1, length(seq1))
 		rs2 = randseq(DNAAlphabet{2}(), sp2, length(seq2))
-		s += score(pairalign(GlobalAlignment(), rs1, rs2, scoremodel))
+		s += BioAlignments.score(pairalign(GlobalAlignment(), rs1, rs2, scoremodel))
 	end
 	s /= nr
 end
@@ -244,7 +244,7 @@ md"""
 """
 
 # ╔═╡ 6e18f4f5-c51c-464d-b633-aa5a37df3a8a
-D = triu( -log.( (S .- Srand) ./ (Smax .- Srand) ) , 1)
+D = triu( -log.( max.(S .- Srand, 1.) ./ (Smax .- Srand) ) , 1)
 
 # ╔═╡ 0d3979ab-8f0e-476f-a623-8d9a15ce9af4
 md"""
@@ -261,17 +261,186 @@ Generate a "guide tree" of phylogenetic relationships from the pairwise distance
 # ╔═╡ 1a1df46a-66b0-4733-bebc-46f9896e7766
 hc = hclust(D, linkage=:average, branchorder=:optimal, uplo=:U)
 
-# ╔═╡ 404f6d5f-08ac-48c1-9178-73cd0bd3d051
-hc.order
+# ╔═╡ 053bd29d-475b-44a5-984e-962a2b124f73
+md"""
+*Set labels:*
+"""
 
 # ╔═╡ b22a39b7-a35b-4923-a18c-8fd630bb7fea
-description.(protein_N_data)
+xtl = map(x -> String(x), description.(protein_N_data))
+
+# ╔═╡ af76bd93-ad2e-439e-957e-90729c858617
+md"""
+#### Interpret your results
+
+Visualize your guide tree and compare it to the phylogenetic tree constructed in @sec-phylo-1. Elaborate with a small text (3-4 lines) to explain what you observe.
+"""
 
 # ╔═╡ bdb9ea2f-a22d-485c-b838-aec7703836fa
 begin
-	plot(hc, xrotation=90, bottom_margin = 50mm)
-	xticks!(1:20, description.(protein_N_data)[hc.order])
+	pl = plot(hc,orientation=:horizontal, xlims=[0, 4])
+	yticks!(1:20,xtl[hc.order])
 end
+
+# ╔═╡ c4b9078e-bd1a-4ebe-905a-8343fc522a63
+md"""
+### Sequence motifs
+
+Do simple motif searching on corona virus sequences using the input dataset (**protein_N_data.fasta**) we have already analysed.
+
+#### MEME analysis
+
+Connect to the MEME platform at [https://meme-suite.org/](https://meme-suite.org/).
+
+- Find the MEME motif discovery tool.
+- Input **protein_N_data.fasta** to discover enriched motifs in this set of sequences, allowing for zero or one motif occurrence per sequence and finding upto 5 motifs. Which discovery mode, sequence alphabet, and site distribution options do you select?
+
+Open and download the **MEME HTML output file** and include the sequence logos of the motifs found in your report.
+
+$(PlutoUI.LocalResource("../figures/protein_N_data_meme_motifs_1.png"))
+
+$(PlutoUI.LocalResource("../figures/protein_N_data_meme_motifs_2.png"))
+
+$(PlutoUI.LocalResource("../figures/protein_N_data_meme_motifs_3.png"))
+
+$(PlutoUI.LocalResource("../figures/protein_N_data_meme_motifs_4.png"))
+
+$(PlutoUI.LocalResource("../figures/protein_N_data_meme_motifs_5.png"))
+"""
+
+# ╔═╡ 6ecb20fc-2deb-488c-875a-c4e65616229f
+md"""
+#### Convert count matrix to PWM
+
+We will work with a 20-nucleotide subset of the first motif found by the MEME software, given by the count matrixin the file **motifCountMatrix.csv**.
+"""
+
+# ╔═╡ e3cf83f5-bb34-41f8-bd7c-99e1c077897b
+begin
+	df = DataFrame(CSV.File(datadir("Coronavirus","motifCountMatrix.csv")))
+	rename!(df, :"base\\position" => "base")
+	df.base = only.(df.base)
+	df
+end
+
+# ╔═╡ 50a8d2fd-f1fe-406d-af2f-43dc713efdf4
+md"""
+1. Compare the count matrix against your sequence logos and mark the 20-nucleotide window corresponding to this count matrix in the right logo.
+"""
+
+# ╔═╡ 78ccc4f5-55ab-469d-97a4-f83ed1e69e57
+md"""
+2. Convert the count matrix to a position-specific probability matrix (PPM) ``P``. To avoid zeros in the PPM, we add *pseudo-counts* and define
+
+   ```math
+   P_{k,i} = \frac{\text{Count}_{k,i} + 0.25 * \sqrt{N}}{N + \sqrt{N}},
+   ```
+
+   where $\text{Count}_{k,i}$ is the value of the count matrix for nucleotide ``k`` in motif position ``i``, and ``N`` is the number of sequences in **protein_N_data.fasta** (Hint: Count the totals in each column of the count matrix).
+
+
+"""
+
+# ╔═╡ ebfd05f9-f130-4974-af88-9e2de6220bec
+Count = Matrix(df[:,2:end])
+
+# ╔═╡ ab6b63a4-4669-4636-a260-cdb282e76446
+N = sum(Count, dims=1)[1]
+
+# ╔═╡ 2f193934-df62-4bfe-b03f-1ee583cb6a1c
+PPM = (Count .+ 0.25*√N) ./ (N + √N)
+
+# ╔═╡ 64dd2abf-858b-4119-a65e-b14c332ad42f
+md"""
+3. Convert the PPM matrix to a position-specific weight matrix (PWM) ``W`` using the formula
+
+   ```math
+   W_{k,i} = \log_2 \frac{P_{k,i}}{0.25}
+   ```
+
+   What would be the value of ``W`` for a random background site with equal counts for all nucleotides and using the pseudo-count formula above to compute the random probabilities?
+"""
+
+# ╔═╡ 67a88754-ce20-4b49-9f5f-eb5c87ecafa8
+PWM = log2.( PPM ./ 0.25)
+
+# ╔═╡ c828dab8-cbf4-4d42-aa75-39a7503f9d05
+md"""
+*If all nucleotides are equally frequent, their counts would be ``0.25N``, their probabilities would be ``(0.25N + 0.25\sqrt N)/(N+\sqrt N)=0.25``, and their weights would be ``\log_2 1 = 0``.*
+"""
+
+# ╔═╡ a1107731-4b65-4916-9fa1-a152878ec313
+md"""
+#### Scan a coronavirus genome for motif occurrences
+
+Scan part of the BetaCoV/Wuhan/IPBCAMS-WH-02/2019 genome (the sequence in the file **GCA\_011537005.1\_partial\_genomic.fasta**) and score all possible motif occurrences. Use the sliding window approach presented in the lecture and report (table and figure) both the log-odds score and the odds of each possible motif starting position in the genome sequence.
+"""
+
+# ╔═╡ 816a19eb-34ac-493f-80d2-f57055607613
+genome = first( FASTAReader( open(datadir("Coronavirus","GCA_011537005.1_partial_genomic.fasta")) ) )
+
+# ╔═╡ 9e1659ed-1716-446c-b68f-d43bd68c2377
+genome_seq = FASTX.sequence(genome)
+
+# ╔═╡ 5e0dc69d-24c9-4715-bfc6-136cfb0dd93f
+md"""
+*Convert the genome sequence into an array of integers where each value corresponds to the row index of the corresponding nucleotide in the PWM:*
+"""
+
+# ╔═╡ bf2585bb-7969-4807-ab45-d9dad0a39447
+begin
+	genome_vec = zeros(Int64,length(genome_seq))
+	for k=1:length(df.base)
+		genome_vec[findall(df.base[k],genome_seq)] .= k
+	end
+	genome_vec
+end
+
+# ╔═╡ 810edb80-cda4-45fa-8c35-a57c2d5f3c07
+md"""
+*Function to score a given segment of the sequence*
+"""
+
+# ╔═╡ e68228a7-e8e7-49d5-aa77-6322b3de498f
+function score_segment(genome_vec, PWM, start)
+	ml = size(PWM,2)
+	return sum(diag(PWM[genome_vec[start:start+ml-1],1:ml]))
+end
+
+# ╔═╡ 090aca02-1f39-4a0d-8c2d-c83a31ec92ac
+md"""
+*Get score for all possible start positions:*
+"""
+
+# ╔═╡ 3d07c839-68f3-4534-b270-9108af9201d6
+begin
+	starts = 1:length(genome_vec)-size(PWM,2)+1
+	score = zeros(size(starts))
+	for start in starts
+		score[start] = score_segment(genome_vec, PWM, start)
+	end
+end
+
+# ╔═╡ 7f3b38bd-7fb8-417b-819d-701a25b38097
+md"""
+*Convert score to odss:*
+"""
+
+# ╔═╡ 46e549f8-4c99-4294-a4e5-068aafaa1853
+odds = 2 .^score
+
+# ╔═╡ 7cfa7582-c62f-4a07-b6bf-9435c5406478
+md"""
+*Plot the odds ratios:*
+"""
+
+# ╔═╡ 17ac9ab5-96c9-4033-9677-5062c4beb700
+plot(starts,odds,line=:stem)
+
+# ╔═╡ f348def8-70be-4846-a682-84930dcb2633
+md"""
+Elaborate with a small text (3-4 lines) to explain what you observe.
+"""
 
 # ╔═╡ Cell order:
 # ╟─f503ce8e-5d23-11ee-0b33-f73001d28c23
@@ -302,6 +471,32 @@ end
 # ╠═6e18f4f5-c51c-464d-b633-aa5a37df3a8a
 # ╟─0d3979ab-8f0e-476f-a623-8d9a15ce9af4
 # ╠═1a1df46a-66b0-4733-bebc-46f9896e7766
-# ╠═404f6d5f-08ac-48c1-9178-73cd0bd3d051
+# ╟─053bd29d-475b-44a5-984e-962a2b124f73
 # ╠═b22a39b7-a35b-4923-a18c-8fd630bb7fea
+# ╟─af76bd93-ad2e-439e-957e-90729c858617
 # ╠═bdb9ea2f-a22d-485c-b838-aec7703836fa
+# ╟─c4b9078e-bd1a-4ebe-905a-8343fc522a63
+# ╟─6ecb20fc-2deb-488c-875a-c4e65616229f
+# ╠═e3cf83f5-bb34-41f8-bd7c-99e1c077897b
+# ╟─50a8d2fd-f1fe-406d-af2f-43dc713efdf4
+# ╟─78ccc4f5-55ab-469d-97a4-f83ed1e69e57
+# ╠═ebfd05f9-f130-4974-af88-9e2de6220bec
+# ╠═ab6b63a4-4669-4636-a260-cdb282e76446
+# ╠═2f193934-df62-4bfe-b03f-1ee583cb6a1c
+# ╟─64dd2abf-858b-4119-a65e-b14c332ad42f
+# ╠═67a88754-ce20-4b49-9f5f-eb5c87ecafa8
+# ╟─c828dab8-cbf4-4d42-aa75-39a7503f9d05
+# ╟─a1107731-4b65-4916-9fa1-a152878ec313
+# ╠═816a19eb-34ac-493f-80d2-f57055607613
+# ╠═9e1659ed-1716-446c-b68f-d43bd68c2377
+# ╟─5e0dc69d-24c9-4715-bfc6-136cfb0dd93f
+# ╠═bf2585bb-7969-4807-ab45-d9dad0a39447
+# ╟─810edb80-cda4-45fa-8c35-a57c2d5f3c07
+# ╠═e68228a7-e8e7-49d5-aa77-6322b3de498f
+# ╟─090aca02-1f39-4a0d-8c2d-c83a31ec92ac
+# ╠═3d07c839-68f3-4534-b270-9108af9201d6
+# ╟─7f3b38bd-7fb8-417b-819d-701a25b38097
+# ╠═46e549f8-4c99-4294-a4e5-068aafaa1853
+# ╟─7cfa7582-c62f-4a07-b6bf-9435c5406478
+# ╠═17ac9ab5-96c9-4033-9677-5062c4beb700
+# ╟─f348def8-70be-4846-a682-84930dcb2633

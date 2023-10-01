@@ -1,6 +1,6 @@
 ---
 title: "BINF200 Assignment 1"
-author: Tom Michoel
+author: Pairwise sequence alignment, database search, gene expression 
 date: 2023-09-04
 published-title: Due date
 number-sections: true
