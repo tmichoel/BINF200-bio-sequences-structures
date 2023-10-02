@@ -46,7 +46,7 @@ Download all files in the following OneDrive folder:
 
 The following files are available:
 
-- **protein_N_data.fasts** - Sequences of the gene coding for coronavirus nucleocapsid (N) protein in a number of coronaviruses
+- **protein\_N\_data.fasta** - Sequences of the gene coding for coronavirus nucleocapsid (N) protein in a number of coronaviruses
 - **GCA_011537005.1_partial_genomic.fasta** - Part of the BetaCoV/Wuhan/IPBCAMS-WH-02/2019 genome
 - **motifCountMatrix.csv** - Count matrix of a sequence motif
 
@@ -123,7 +123,7 @@ Based on the results from the previous step, build a phylogenetic tree. (Hint: a
 
 *After uploading **protein\_N\_data.fasta** and running Clustal Omega, the output page has a tab "Phylogenetic Tree". Here is a screenshot of the tree:*
 
-$(PlutoUI.LocalResource("../figures/protein_N_data_clustalo_phylotree.png"))
+$(PlutoUI.LocalResource("../figures/Coronavirus/protein_N_data_clustalo_phylotree.png"))
 """
 
 # ╔═╡ cbf62395-5f9a-41bf-bade-c32a021fbe60
@@ -136,7 +136,7 @@ Based on the results from the previous two steps, what do you see? Elaborate wit
 
 #### Compute pairwise similarities 
 
-Use the Needleman-Wunsch (dynamic programming) pairwise alignment algorithm to build a matrix of global alignment scores for each pair of sequences in **protein_N_data.fasta**. You can choose between multiple options:
+Use the Needleman-Wunsch (dynamic programming) pairwise alignment algorithm to build a matrix of global alignment scores for each pair of sequences in **protein\_N\_data.fasta**. You can choose between multiple options:
 
 - Implement the Needleman-Wunsch algorithm yourself. (Hint: You have probably done this already in BINF100) 
 - Use an existing implementation of the algorithm. (Hint: Check biopython, biojulia)
@@ -185,7 +185,7 @@ where
 
 - ``S_{obs}`` is the observed pairwise alignment score
 - ``S_{max}`` is the best alignment score for both sequences, obtained by taking the average of the score of aligning either sequence to itself
-- ``S_{rand}`` is the expected (average) score for aligning two random sequences of the same length and residue composition, obtained by random shuffling the nucleotide composition of the two sequences. (Hint: more info about the Feng & Doolittle can be found at this URL: [https://rna.informatik.uni-freiburg.de/Teaching/index.jsp?toolName=Feng-Doolittle](https://rna.informatik.uni-freiburg.de/Teaching/index.jsp?toolName=Feng-Doolittle))
+- ``S_{rand}`` is the expected (average) score for aligning two random sequences of the same length and residue composition, obtained by random shuffling the nucleotide composition of the two sequences.
 
 Compute $S_{rand}$ by taking the average score of **10** pairwise alignments between random sequences with the same sequence compositions as the original sequences.
 """
@@ -286,26 +286,26 @@ end
 md"""
 ### Sequence motifs
 
-Do simple motif searching on corona virus sequences using the input dataset (**protein_N_data.fasta**) we have already analysed.
+Do simple motif searching on corona virus sequences using the input dataset (**protein\_N\_data.fasta**) we have already analysed.
 
 #### MEME analysis
 
 Connect to the MEME platform at [https://meme-suite.org/](https://meme-suite.org/).
 
 - Find the MEME motif discovery tool.
-- Input **protein_N_data.fasta** to discover enriched motifs in this set of sequences, allowing for zero or one motif occurrence per sequence and finding upto 5 motifs. Which discovery mode, sequence alphabet, and site distribution options do you select?
+- Input **protein\_N\_data.fasta** to discover enriched motifs in this set of sequences, allowing for zero or one motif occurrence per sequence and finding upto 5 motifs. Which discovery mode, sequence alphabet, and site distribution options do you select?
 
 Open and download the **MEME HTML output file** and include the sequence logos of the motifs found in your report.
 
-$(PlutoUI.LocalResource("../figures/protein_N_data_meme_motifs_1.png"))
+$(PlutoUI.LocalResource("../figures/Coronavirus/protein_N_data_meme_motifs_1.png"))
 
-$(PlutoUI.LocalResource("../figures/protein_N_data_meme_motifs_2.png"))
+$(PlutoUI.LocalResource("../figures/Coronavirus/protein_N_data_meme_motifs_2.png"))
 
-$(PlutoUI.LocalResource("../figures/protein_N_data_meme_motifs_3.png"))
+$(PlutoUI.LocalResource("../figures/Coronavirus/protein_N_data_meme_motifs_3.png"))
 
-$(PlutoUI.LocalResource("../figures/protein_N_data_meme_motifs_4.png"))
+$(PlutoUI.LocalResource("../figures/Coronavirus/protein_N_data_meme_motifs_4.png"))
 
-$(PlutoUI.LocalResource("../figures/protein_N_data_meme_motifs_5.png"))
+$(PlutoUI.LocalResource("../figures/Coronavirus/protein_N_data_meme_motifs_5.png"))
 """
 
 # ╔═╡ 6ecb20fc-2deb-488c-875a-c4e65616229f
@@ -404,7 +404,7 @@ md"""
 # ╔═╡ e68228a7-e8e7-49d5-aa77-6322b3de498f
 function score_segment(genome_vec, PWM, start)
 	ml = size(PWM,2)
-	return sum(diag(PWM[genome_vec[start:start+ml-1],1:ml]))
+	return tr(PWM[genome_vec[start:start+ml-1],1:ml])
 end
 
 # ╔═╡ 090aca02-1f39-4a0d-8c2d-c83a31ec92ac

@@ -33,7 +33,7 @@ Download all files in the following OneDrive folder:
 
 You should find the following files:
 
-- **protein_N_data.fasts** - Sequences of the gene coding for coronavirus nucleocapsid (N) protein in a number of coronaviruses
+- **protein_N_data.fasta** - Sequences of the gene coding for coronavirus nucleocapsid (N) protein in a number of coronaviruses
 - **GCA_011537005.1_partial_genomic.fasta** - Part of the BetaCoV/Wuhan/IPBCAMS-WH-02/2019 genome
 - **motifCountMatrix.csv** - Count matrix of a sequence motif
 
