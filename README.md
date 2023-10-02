@@ -1,5 +1,7 @@
 # BINF200 Biological Sequences and Structures
 
+## Installation
+
 This code base is using the [Julia Language](https://julialang.org/) and
 [DrWatson](https://juliadynamics.github.io/DrWatson.jl/stable/)
 to make a reproducible scientific project named
@@ -28,3 +30,24 @@ using DrWatson
 @quickactivate "BINF200"
 ```
 which auto-activate the project and enable local path handling from DrWatson.
+
+## Notebooks
+
+The `.jl` files in the `notebooks` folder are [Pluto](https://plutojl.org/) notebooks. Follow the instructions at the bottom of the [Pluto](https://plutojl.org/) or on the [MIT Introduction to Computational Thinking page](https://computationalthinking.mit.edu/Fall23/installation/) to install [Pluto](https://plutojl.org/) and run these notebooks.
+
+## Raw data
+
+To run the scripts and notebooks in this repository you need to download was data and store it in the right location.
+
+### Long read sequencing data of expressed antigens in Trypanosoma brucei infections
+
+Download the files available [at this OneDrive URL](https://universityofbergen-my.sharepoint.com/:f:/r/personal/tom_michoel_uib_no/Documents/public/BINF200/PacBio_VSG?csf=1&web=1).
+
+Store the files in a subfolder `PacBio_VSG` of the `data` folder, keeping the folder structure of the OneDrive folder intact.
+
+### Coronavirus data
+
+Download the files available [at this OneDrive URL](https://universityofbergen-my.sharepoint.com/:f:/r/personal/tom_michoel_uib_no/Documents/public/BINF200/Coronavirus?csf=1&web=1).
+
+
+Store the files in a subfolder `Coronavirus` of the `data` folder.
