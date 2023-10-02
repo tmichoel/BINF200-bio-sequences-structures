@@ -14,13 +14,9 @@ format:
 
 2. Need lecture on Unix command line, Pandas (dataframes, split-apply-combine), BioPython/SeqIO before Assignment 1. Can replace RNA-seq lecture.
 
-3. Assignment 2 needs task about sequence motifs.
+3. Order modules DNA -> RNA -> protein. 
 
-4. Weekly exercises to practice *all* topics.
-
-5. Order modules DNA -> RNA -> protein. 
-
-6. Motif discovery lecture (EM, Gibbs sampler) needs proper structure
+4. Motif discovery slides (EM, Gibbs sampler) need better structure
    - General idea of cycling between given start sites, update PWM, and given PWM, update start sites
    - Representing starting positions and PWMs
    - Generative model $P(seq \mid PWM, starting pos)$
