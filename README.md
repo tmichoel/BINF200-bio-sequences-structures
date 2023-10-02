@@ -35,7 +35,7 @@ The `.jl` files in the `notebooks` folder are [Pluto](https://plutojl.org/) note
 
 ## Raw data
 
-To run the scripts and notebooks in this repository you need to download was data and store it in the right location.
+To run the scripts and notebooks in this repository you need to download the following data and store it in the right location.
 
 ### Long read sequencing data of expressed antigens in Trypanosoma brucei infections
 
