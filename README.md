@@ -31,7 +31,12 @@ which auto-activate the project and enable local path handling from DrWatson.
 
 ## Notebooks
 
-The `.jl` files in the `notebooks` folder are [Pluto](https://plutojl.org/) notebooks. Follow the instructions at the bottom of the [Pluto](https://plutojl.org/) homepage or on the [MIT Introduction to Computational Thinking page](https://computationalthinking.mit.edu/Fall23/installation/) to install [Pluto](https://plutojl.org/) and run these notebooks.
+The `.jl` files in the `notebooks` folder are [Pluto](https://plutojl.org/) notebooks. To run these notebooks, assuming you completed the above [installation instructions](#installation), open a Julia console in the project directory and do:
+```
+julia> using Pluto
+julia> Pluto.run()
+```
+Find more details at the bottom of the [Pluto homepage](https://plutojl.org/)  or on the [MIT Introduction to Computational Thinking page](https://computationalthinking.mit.edu/Fall23/installation/).
 
 ## Raw data
 
