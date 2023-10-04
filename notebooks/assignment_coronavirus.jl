@@ -347,6 +347,9 @@ Count = Matrix(df[:,2:end])
 # ╔═╡ ab6b63a4-4669-4636-a260-cdb282e76446
 N = sum(Count, dims=1)[1]
 
+# ╔═╡ 21196e69-b864-4880-9722-c9362d611d84
+N*(N+1)/2
+
 # ╔═╡ 2f193934-df62-4bfe-b03f-1ee583cb6a1c
 PPM = (Count .+ 0.25*√N) ./ (N + √N)
 
@@ -460,6 +463,7 @@ Elaborate with a small text (3-4 lines) to explain what you observe.
 # ╟─4eed04b6-39d3-4d9c-9d12-3bb6bf566fec
 # ╠═af109968-cab5-4603-8a44-a044abf1fae2
 # ╠═fdf16615-3a4e-4961-bf42-3f78312e6efe
+# ╠═21196e69-b864-4880-9722-c9362d611d84
 # ╟─18bb5a3f-2cb2-4cb3-8e4e-28396f3f6ed3
 # ╠═81b0c557-9965-4ece-b2f4-9e3800bcc387
 # ╠═75c19231-4f64-42c3-831d-5c9d010f652f
