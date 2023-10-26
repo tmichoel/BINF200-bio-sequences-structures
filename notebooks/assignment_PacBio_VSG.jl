@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.27
+# v0.19.29
 
 using Markdown
 using InteractiveUtils
@@ -192,7 +192,10 @@ Applied to the score formula, we see that the slope parameter is given ``a=\frac
 """
 
 # ╔═╡ 44027cb8-0a54-42cb-baa3-0c56cbf661e9
-y2-a*x2
+log2(K)
+
+# ╔═╡ 6a2e449b-5a8f-48a6-ba96-7147dcedbc78
+a
 
 # ╔═╡ ce28181d-db1c-4521-a6e3-17ec9386dcd6
  vsg = unique(df_hc.sseqid)
@@ -297,6 +300,7 @@ length(filtered_reads)
 # ╠═8c27c535-e079-4fda-8bba-2eeaaab4c7ea
 # ╠═bc8dcde6-ba0a-4a69-a77f-19777724c57c
 # ╠═44027cb8-0a54-42cb-baa3-0c56cbf661e9
+# ╠═6a2e449b-5a8f-48a6-ba96-7147dcedbc78
 # ╟─51a53766-c67f-46bf-9724-53b1eb420258
 # ╠═ce28181d-db1c-4521-a6e3-17ec9386dcd6
 # ╟─f9e62367-ca9d-49a4-b576-ddcd3ed3f917

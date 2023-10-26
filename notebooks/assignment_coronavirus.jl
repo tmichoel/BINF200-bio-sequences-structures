@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.27
+# v0.19.29
 
 using Markdown
 using InteractiveUtils
@@ -246,6 +246,9 @@ md"""
 # ╔═╡ 6e18f4f5-c51c-464d-b633-aa5a37df3a8a
 D = triu( -log.( max.(S .- Srand, 1.) ./ (Smax .- Srand) ) , 1)
 
+# ╔═╡ fd0b5a14-2838-455b-b6af-5af4471e6009
+D[2,8]
+
 # ╔═╡ 0d3979ab-8f0e-476f-a623-8d9a15ce9af4
 md"""
 #### Generate a "guide tree" of phylogenetic relationships
@@ -473,6 +476,7 @@ Elaborate with a small text (3-4 lines) to explain what you observe.
 # ╠═60e20fe5-a39d-4b33-b386-4d8b574293a0
 # ╟─76448d4e-2894-49a6-8f75-b75361e36927
 # ╠═6e18f4f5-c51c-464d-b633-aa5a37df3a8a
+# ╠═fd0b5a14-2838-455b-b6af-5af4471e6009
 # ╟─0d3979ab-8f0e-476f-a623-8d9a15ce9af4
 # ╠═1a1df46a-66b0-4733-bebc-46f9896e7766
 # ╟─053bd29d-475b-44a5-984e-962a2b124f73

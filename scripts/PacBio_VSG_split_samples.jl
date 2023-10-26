@@ -6,7 +6,7 @@ using FASTX
 
 # Read all filtered reads in a vector of FASTA records
 vsgseq = Vector{FASTARecord}();
-FASTAReader( open(datadir("PacBio_VSG", "orig", "PacBio_VSG_filtered_reads.fasta")) ) do reader
+FASTAReader( open(datadir("PacBio_VSG", "original", "PacBio_VSG_filtered_reads.fasta")) ) do reader
     for record in reader
         push!(vsgseq, record)
     end
