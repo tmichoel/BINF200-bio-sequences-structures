@@ -56,3 +56,7 @@ Download the files available [at this OneDrive URL](https://universityofbergen-m
 
 
 Store the files in a subfolder `Coronavirus` of the `data` folder.
+
+## Releases
+
+[![DOI](https://zenodo.org/badge/673794071.svg)](https://zenodo.org/doi/10.5281/zenodo.10043221)
