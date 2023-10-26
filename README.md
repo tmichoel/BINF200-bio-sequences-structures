@@ -40,13 +40,15 @@ Find more details at the bottom of the [Pluto homepage](https://plutojl.org/)  o
 
 ## Raw data
 
-To run the scripts and notebooks in this repository you need to download the following data and store it in the right location.
+To run the scripts and notebooks in this repository you first need to create a folder `data` in the repository's root folder. Then download the following datasets and store them in the right location.
 
 ### Long read sequencing data of expressed antigens in Trypanosoma brucei infections
 
-Download the files available [at this OneDrive URL](https://universityofbergen-my.sharepoint.com/:f:/r/personal/tom_michoel_uib_no/Documents/public/BINF200/PacBio_VSG?csf=1&web=1).
+1. Create a subfolder `PacBio_VSG` of the `data` folder.
 
-Store the files in a subfolder `PacBio_VSG` of the `data` folder, keeping the folder structure of the OneDrive folder intact.
+2. Download the files in [this dataset](https://doi.org/10.18710/FFANM01) and store them in the `PacBio_VSG` folder, keeping the folder structure of the OneDrive folder intact.
+
+**Note:** If you only want to run the [notebooks](#notebooks), you *don't* need to download the contents of the `original` folder of [the dataset](https://doi.org/10.18710/FFANM01).
 
 ### Coronavirus data
 
