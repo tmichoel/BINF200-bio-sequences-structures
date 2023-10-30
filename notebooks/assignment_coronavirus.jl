@@ -440,8 +440,17 @@ md"""
 *Plot the odds ratios:*
 """
 
+# ╔═╡ 910a65ee-b632-43e2-af49-50e1ecf74ea0
+sort(score,rev=true)
+
 # ╔═╡ 17ac9ab5-96c9-4033-9677-5062c4beb700
 plot(starts,odds,line=:stem)
+
+# ╔═╡ e1c75146-1080-4d14-b5bc-cbac279030d0
+plot(starts,score,line=:stem)
+
+# ╔═╡ 54164f15-eb87-4840-93cb-65cf5aaac745
+maximum(score)
 
 # ╔═╡ f348def8-70be-4846-a682-84930dcb2633
 md"""
@@ -506,5 +515,8 @@ Elaborate with a small text (3-4 lines) to explain what you observe.
 # ╟─7f3b38bd-7fb8-417b-819d-701a25b38097
 # ╠═46e549f8-4c99-4294-a4e5-068aafaa1853
 # ╟─7cfa7582-c62f-4a07-b6bf-9435c5406478
+# ╠═910a65ee-b632-43e2-af49-50e1ecf74ea0
 # ╠═17ac9ab5-96c9-4033-9677-5062c4beb700
+# ╠═e1c75146-1080-4d14-b5bc-cbac279030d0
+# ╠═54164f15-eb87-4840-93cb-65cf5aaac745
 # ╟─f348def8-70be-4846-a682-84930dcb2633
