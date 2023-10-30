@@ -46,9 +46,9 @@ To run the scripts and notebooks in this repository you first need to create a f
 
 1. Create a subfolder `PacBio_VSG` of the `data` folder.
 
-2. Download the files in [this dataset](https://dataverse.no/dataset.xhtml?persistentId=doi:10.18710/FFANM0) and store them in the `PacBio_VSG` folder, keeping the folder structure of the OneDrive folder intact.
+2. Download the files in [this dataset](https://doi.org/10.18710/FFANM0) and store them in the `PacBio_VSG` folder, keeping the folder structure of the OneDrive folder intact.
 
-**Note:** If you only want to run the [notebooks](#notebooks), you *don't* need to download the contents of the `original` folder of [the dataset](https://dataverse.no/dataset.xhtml?persistentId=doi:10.18710/FFANM0).
+**Note:** If you only want to run the [notebooks](#notebooks), you *don't* need to download the contents of the `original` folder of [the dataset](https://doi.org/10.18710/FFANM0).
 
 ### Coronavirus data
 
