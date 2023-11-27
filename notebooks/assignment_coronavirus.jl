@@ -443,6 +443,9 @@ md"""
 # ╔═╡ 910a65ee-b632-43e2-af49-50e1ecf74ea0
 sort(score,rev=true)
 
+# ╔═╡ 7df63712-791f-4d87-95b1-1d38c8061fe6
+1/7.328201e-09
+
 # ╔═╡ 17ac9ab5-96c9-4033-9677-5062c4beb700
 plot(starts,odds,line=:stem)
 
@@ -516,6 +519,7 @@ Elaborate with a small text (3-4 lines) to explain what you observe.
 # ╠═46e549f8-4c99-4294-a4e5-068aafaa1853
 # ╟─7cfa7582-c62f-4a07-b6bf-9435c5406478
 # ╠═910a65ee-b632-43e2-af49-50e1ecf74ea0
+# ╠═7df63712-791f-4d87-95b1-1d38c8061fe6
 # ╠═17ac9ab5-96c9-4033-9677-5062c4beb700
 # ╠═e1c75146-1080-4d14-b5bc-cbac279030d0
 # ╠═54164f15-eb87-4840-93cb-65cf5aaac745
