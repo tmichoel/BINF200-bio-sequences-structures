@@ -20,6 +20,6 @@ do
     # ORF file name
     orf=orf/PacBio_VSG_filtered_reads_ORF_$sample.fasta
     # GetORF command
-    /usr/local/emboss/bin/getorf -sequence $qf -outseq $orf -minsize 1200 -find 3 -reverse N
+    /usr/bin/getorf -sequence $qf -outseq $orf -minsize 1200 -find 3 -reverse N
 done
 
