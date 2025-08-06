@@ -3,6 +3,7 @@
 _site/
 .jupyter_cache
 assignments/*_files/
+notebooks/marimo/layouts/
 
 ################################################################################
 #                          DrWatson Project Structure                          #
