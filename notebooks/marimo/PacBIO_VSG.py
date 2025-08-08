@@ -126,12 +126,6 @@ def _(df):
     return (df_qseqid_count,)
 
 
-@app.cell
-def _(df):
-    df.groupby("qseqid").aggregate([{"nrow": "len"}, {"sseqid": "nunique"}])
-    return
-
-
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""We can verify that sometimes two alignments were found per query sequence:""")
@@ -166,14 +160,6 @@ def _(mo):
     """
     )
     return
-
-
-app._unparsable_cell(
-    r"""
-     df
-    """,
-    name="_"
-)
 
 
 @app.cell
