@@ -22,10 +22,16 @@ def _(mo):
     return
 
 
+@app.cell
+def _(os):
+    os.getcwd()
+    return
+
+
 @app.cell(hide_code=True)
 def _(mo):
     import os
-    datadir = os.path.join("..", "..", "data", "PacBio_VSG")
+    datadir = os.path.join("data", "PacBio_VSG")
     dropdown = mo.ui.dropdown(["balbc_3_0", "balbc_3_1", "balbc_3_2", "balbc_3_3", "balbc_3_4", "balbc_6_0", "balbc_6_1", "balbc_6_2", "balbc_6_4", "balbc_6_5", "balbc_10_0", "balbc_10_1", "balbc_10_2", "balbc_10_4", "balbc_10_5","balbc_12_1", "balbc_12_2", "balbc_12_3", "balbc_12_4", "balbc_12_5"])
     dropdown
     return datadir, dropdown, os
